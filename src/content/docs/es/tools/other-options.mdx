@@ -1,0 +1,71 @@
+---
+title: Other Options
+description: Traduce nombres del japonés al inglés, separa mallas, corrige normales y usa un conjunto de herramientas extra para shape keys, huesos de torsión y piernas.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+**Other Options** reúne las herramientas que no encajan en otro sitio. El panel empieza plegado, y un interruptor **Show More Options** muestra un segundo grupo de herramientas.
+
+<Shot
+	name="panel-other-options"
+	alt="El panel Other Options con Show More Options activado: Separate by, Translate, Normals y herramientas de shape keys y de huesos."
+	caption="Other Options con Show More Options activado."
+/>
+
+## Separate by
+
+Divide la malla activa, o la única malla del modelo:
+
+- **Materials** crea una malla por material.
+- **Loose Parts** crea una malla por cada pieza desconectada, para un control más fino.
+- **Shapes** divide la malla en dos: la parte que mueven las shape keys y el resto. Viene bien antes de reducir la geometría a mano, porque así puedes simplificar la parte estática sin tocar la cara.
+
+<Aside type="caution">
+	Nunca reduzcas la geometría de una parte en la que puedas necesitar shape keys más adelante: cara,
+	boca, ojos.
+</Aside>
+
+## Translate
+
+Los modelos de MMD suelen venir con nombres en japonés. Estos botones los traducen al inglés:
+
+- **All** traduce huesos, shape keys, objetos y materiales, en ese orden.
+- **Shape Keys**, **Objects**, **Bones** y **Materials** traducen un solo tipo de nombre.
+
+Cats busca primero los nombres en su diccionario integrado y luego envía el resto a Google Translate. Los resultados de Google se guardan en caché en tu ordenador, así que cada nombre solo se envía una vez. Los huesos y las shape keys se traducen en **todas** las armaduras y mallas del archivo, no solo en el modelo seleccionado. Las shape keys que empiezan por `vrc.` nunca se tocan.
+
+Dos opciones cambian cómo se traducen las shape keys:
+
+- **Use Old Translations (not recommended)** se salta el diccionario y solo usa Google, como Cats 0.9.0 y anteriores. Úsalo solo si tienes animaciones que dependen de los nombres antiguos.
+- **Skip Locked Shape Keys** no toca las shape keys que bloqueaste con el icono del candado en la lista de shape keys de Blender.
+
+Si no se puede contactar con Google o te bloquea durante un rato, Cats aplica igualmente su diccionario e indica que algunas partes no se han podido traducir. Vuelve a intentarlo más tarde para el resto. Puedes vaciar la caché en [Settings & Updates](../settings/).
+
+## Show More Options
+
+### Normales
+
+- **Recalculate** hace que las normales de la malla activa vuelvan a apuntar hacia fuera. Úsalo cuando algunas caras se vean invertidas o más oscuras. No lo uses en mallas que ya se ven bien.
+- **Flip** invierte todas las normales, para mallas que están completamente del revés.
+
+### Transformaciones
+
+**Apply Transformations** aplica la posición, la rotación y la escala a la armadura y sus mallas. El pequeño botón de al lado las aplica a todos los objetos de la escena.
+
+### Shape keys
+
+- **Remove Unused Shapekeys** borra las shape keys de la malla activa que no mueven ningún vértice. `vrc.v_sil` siempre se conserva. La malla tiene que estar seleccionada, en modo Object.
+- **Repair Broken Shapekeys** intenta arreglar las shape keys dañadas por algunas operaciones de Blender.
+- **Optimize Static Shapekeys** mueve a su propia malla la parte que afectan las shape keys y quita las shape keys del resto, que pasa a llamarse `Static`. Esto reduce el coste en GPU del avatar. Une antes tus mallas: Cats se niega a trabajar con varias.
+- **Fix Koikatsu Shapekeys** repara las shape keys de los modelos de Koikatsu.
+
+El menú de shape keys de las propiedades Object Data de Blender también gana dos entradas de Cats: **Apply Selected Shapekey to Basis**, que aplica la shape key seleccionada a Basis y guarda una copia invertida, y **Remove Unused Shapekeys**.
+
+### Huesos
+
+- **Create Digitigrade Legs** convierte una pierna en digitígrada, para avatares de aspecto animal. Selecciona antes dos huesos en modo Edit; el enlace **How to use** abre un tutorial.
+- **Generate Twist Bones** añade huesos de torsión a los huesos seleccionados y reparte sus pesos. **Upper Body** incluye también la columna y el cuello.
+- **Convert Bones To Valve** renombra los huesos principales con los nombres de Source Engine. Antes, el modelo necesita los nombres estándar de [Fix MMD Model](../mmd-options/).

@@ -1,0 +1,65 @@
+<div class="floor" aria-hidden="true">
+	<div class="plane"></div>
+</div>
+
+<style>
+	.floor {
+		position: absolute;
+		z-index: -1;
+		bottom: 0;
+		left: calc(50% - 50vw);
+		width: 100vw;
+		height: 460px;
+		overflow: hidden;
+		perspective: 520px;
+		perspective-origin: 50% 0%;
+		pointer-events: none;
+		-webkit-mask-image:
+			linear-gradient(to bottom, transparent 0%, #000 45%, #000 70%, transparent 100%),
+			linear-gradient(to right, transparent, #000 25%, #000 75%, transparent);
+		-webkit-mask-composite: source-in;
+		mask-image:
+			linear-gradient(to bottom, transparent 0%, #000 45%, #000 70%, transparent 100%),
+			linear-gradient(to right, transparent, #000 25%, #000 75%, transparent);
+		mask-composite: intersect;
+	}
+	.plane {
+		--line: color-mix(in srgb, var(--sl-color-gray-4) 55%, transparent);
+		--x-axis: rgb(229 72 88 / 0.5);
+		--y-axis: rgb(139 200 40 / 0.35);
+		position: absolute;
+		left: -60%;
+		right: -60%;
+		bottom: 0;
+		height: 1800px;
+		transform-origin: 50% 100%;
+		transform: rotateX(72deg);
+		background-image:
+			linear-gradient(
+				to right,
+				transparent calc(50% - 1px),
+				var(--y-axis) calc(50% - 1px),
+				var(--y-axis) calc(50% + 1px),
+				transparent calc(50% + 1px)
+			),
+			linear-gradient(
+				to bottom,
+				transparent calc(94% - 1px),
+				var(--x-axis) calc(94% - 1px),
+				var(--x-axis) calc(94% + 1px),
+				transparent calc(94% + 1px)
+			),
+			linear-gradient(var(--line) 1px, transparent 1px),
+			linear-gradient(90deg, var(--line) 1px, transparent 1px);
+		background-size:
+			100% 100%,
+			100% 100%,
+			72px 72px,
+			72px 72px;
+		background-position:
+			0 0,
+			0 0,
+			center bottom,
+			center bottom;
+	}
+</style>

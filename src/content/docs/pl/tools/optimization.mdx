@@ -1,0 +1,130 @@
+---
+title: Optimization
+description: Zbuduj atlas tekstur za pomocą Material Combiner, scal identyczne materiały, konwertuj tekstury, łącz siatki, usuwaj zdublowane wierzchołki i zmniejszaj liczbę kości.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+VRChat ocenia awatary według kosztu renderowania: głównie materiałów, siatek i kości. Panel **Optimization** ma trzy sekcje, wszystkie widoczne po rozwinięciu panelu: **Atlas Generation**, **Material Operations** i **Bone Merging**.
+
+## Atlas Generation
+
+Atlas pakuje tekstury kilku materiałów w jeden obraz, dzięki czemu cały awatar może używać jednego lub dwóch materiałów. Cats sam nie buduje atlasów: wyświetla interfejs **Material Combiner**, osobnego dodatku autorstwa Shotariya.
+
+<Shot
+	name="panel-optimization-atlas"
+	alt="Sekcja Atlas Generation z komunikatem Material Combiner is not installed i przyciskiem Download Material Combiner."
+	caption="Atlas Generation przed instalacją Material Combiner."
+/>
+
+### Konfiguracja Material Combiner
+
+Sekcja informuje, w jakim stanie jest Material Combiner:
+
+| Komunikat                                                               | Co zrobić                                                                                                   |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Material Combiner is not installed!**                                 | Kliknij **Download Material Combiner**, zainstaluj plik zip ze strony wydań jako dodatek i wróć tutaj.      |
+| **Material Combiner is not enabled!**                                   | Kliknij **Enable Material Combiner**. Cats wyłącza starsze kopie i włącza najnowszą.                        |
+| **Your Material Combiner is outdated!**                                 | Zaktualizuj go w jego własnym panelu lub pobierz najnowsze wydanie. Cats wymaga wersji 2.1.2.9 lub nowszej. |
+| **Your Material Combiner is out of date, please use the master branch** | W zainstalowanej wersji brakuje elementów, na których opiera się Cats. Zainstaluj nowszą kompilację.        |
+
+Material Combiner potrzebuje też biblioteki graficznej Pillow. Jeśli jej brakuje, sekcja wyświetla przycisk **Install Pillow**. Po instalacji uruchom Blendera ponownie.
+
+### Budowanie atlasu
+
+<Steps>
+
+1. Kliknij **Generate Material List**. Material Combiner wyświetli wszystkie materiały modelu.
+
+2. Odznacz materiały, które mają pozostać poza atlasem.
+
+3. Kliknij **Save Atlas to..** i wybierz miejsce zapisu obrazu atlasu. Material Combiner zapisze go i przełączy model na atlas.
+
+</Steps>
+
+W przypadku map normalnych i innych tekstur PBR sekcja odsyła do Tuxedo Blender Plugin. Przycisk **?** otwiera wskazówki dotyczące atlasów.
+
+## Material Operations
+
+<Shot
+	name="panel-optimization-materials"
+	alt="Sekcja Material Operations: Combine Same Materials, Convert Textures to PNG, Join Meshes All i Selected oraz Remove Doubles z progiem."
+/>
+
+### Combine Same Materials
+
+Scala identyczne materiały: z tymi samymi teksturami, kolorami i wartościami shadera. Ściany są przenoszone do jednego z nich, a nieużywane sloty usuwane. Awatar powinien wyglądać dokładnie tak samo, ale z mniejszą liczbą wywołań rysowania. Cats zgłasza **Combined N materials!** lub **No materials combined.**
+
+Tekstury toon i sphere z MMD są pomijane przy porównaniu, więc materiały różniące się tylko nimi również zostaną scalone.
+
+### Convert Textures to PNG
+
+Konwertuje do PNG każdą teksturę, która nie jest jeszcze w tym formacie, zapisuje ją obok oryginału i kieruje materiał na nowy plik. Pozwala to uniknąć problemów z przezroczystością i zgodnością formatów takich jak TGA czy DDS.
+
+<Aside type="caution">
+	Zmienia to ustawienia wyjścia renderowania sceny (format, głębię kolorów, kompresję) na PNG i
+	pozostawia je w tym stanie. Przywróć je we właściwościach Output, jeśli później renderujesz z tego
+	pliku.
+</Aside>
+
+### Join Meshes
+
+- **All** łączy wszystkie siatki podpięte do szkieletu, tak samo jak **Join all meshes** w [Quick Access](../quick-access/).
+- **Selected** łączy tylko siatki zaznaczone w Outlinerze.
+
+Obie opcje stosują transformacje, usuwają modyfikatory Subdivision Surface, zmieniają nazwę pierwszej mapy UV na `UVMap`, zachowują jeden modyfikator Armature i przywracają kolejność shape keys. Gdy zostaje jedna siatka, otrzymuje nazwę `Body`.
+
+Jeśli siatka współdzieli dane z innym obiektem, Cats odmawia i prosi o wcześniejsze uruchomienie **Object > Relations > Make Single User**.
+
+### Remove Doubles
+
+Scala wierzchołki położone bliżej niż **Threshold** (domyślnie `0.00002`) na zaznaczonych siatkach lub na pierwszej siatce, jeśli żadna nie jest zaznaczona, a następnie usuwa luźne wierzchołki.
+
+Jeśli siatka ma shape keys, na które może to wpłynąć, Cats pyta przed kontynuowaniem. Scalenie wierzchołków rozsuwanych przez shape keys, na przykład powiek lub warg, może zepsuć tę mimikę, więc sprawdź ją później.
+
+## Bone Merging
+
+Kości fizyki we włosach, spódnicach i ogonach szybko się mnożą. Ta sekcja pozwala zmniejszyć ich liczbę.
+
+<Shot
+	name="panel-optimization-bones"
+	alt="Sekcja Bone Merging: lista To Merge z pozycją J_Sec_SkirtSide1 (2 bones), Merge Ratio ustawione na 50%, przyciski Merge Weights, Delete i Duplicate Bones."
+/>
+
+### Merge Bones
+
+<Steps>
+
+1. Wybierz siatkę w **Mesh**, jeśli model ma ich więcej niż jedną.
+
+2. Wybierz grupę w **To Merge**. Cats wyświetla grupy kości rodzeństwa o podobnych nazwach, na przykład pasma kucyka, i pomija główne kości ciała.
+
+3. Ustaw **Merge Ratio**. Przy 50% mniej więcej co druga kość w każdym łańcuchu jest scalana z rodzicem. Wyższa wartość scala więcej.
+
+4. Kliknij **Merge Bones**.
+
+</Steps>
+
+Scalone kości przekazują wagi rodzicowi i są usuwane. Po zmianie szkieletu kliknij **Refresh List**, ponieważ lista jest przechowywana w pamięci podręcznej.
+
+### Merge Weights
+
+Zaznacz kości w trybie Edit lub Pose, a następnie:
+
+- **To Parents** usuwa każdą zaznaczoną kość i dodaje jej wagi do najbliższego niezaznaczonego rodzica.
+- **To Active** usuwa zaznaczone kości oprócz aktywnej (ostatnio klikniętej) i przekazuje jej wszystkie ich wagi.
+
+Zaznacz **Keep Merged Bones**, aby zachować kości po przeniesieniu ich wag, lub **Merge Visible Meshes Only**, aby pominąć ukryte siatki.
+
+### Delete
+
+- **Zero Weight Bones** usuwa kości, które nie poruszają żadnych wierzchołków. Główne kości humanoidalne i kości `Root_` są zachowywane. Opcje pod przyciskami pozwalają też zachować kości skrętu, puste kości nadrzędne kości z wagami lub ukryte kości.
+- **Constraints** usuwa wszystkie ograniczenia kości. VRChat z nich nie korzysta.
+- **Zero Weight Vertex Groups** usuwa grupy wierzchołków bez wag na wszystkich siatkach w scenie.
+
+### Duplikowanie i łączenie
+
+- **Duplicate Bones** kopiuje zaznaczone kości wraz z wagami jako `<name>_copy`.
+- **Connect Bones** łączy każdą kość z jej rodzicem i prostuje ich orientację.

@@ -1,0 +1,76 @@
+---
+title: Custom Model Creation
+description: Fusionnez l'armature d'un modèle dans une autre, par exemple pour ajouter une tenue ou une partie du corps, ou attachez un maillage unique à un os.
+sourceUpdated: 2026-09-23
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**Custom Model Creation** combine des modèles. Il comporte deux sections : **Merge Armatures**, pour réunir deux modèles riggés en un seul, et **Attach Mesh**, pour fixer un objet non riggé à un os unique.
+
+## Merge Armatures
+
+Servez-vous-en pour ajouter une tenue, des cheveux ou une partie du corps riggés à un avatar. La section nécessite au moins deux armatures dans la scène ; sinon, elle affiche seulement **Two armatures are required!**
+
+### Avant de fusionner
+
+- Exécutez [Fix MMD Model](../mmd-options/) sur les deux modèles s'il s'agit d'imports MMD ou VRM bruts, pour que leurs os partagent les mêmes noms standard.
+- Ne mettez en place que le **maillage** du modèle que vous ajoutez. Cats déplace ses os pour qu'ils correspondent à l'armature de base.
+- Aucune des deux armatures ne doit partager ses données avec un autre objet. Si c'est le cas, lancez d'abord **Object > Relations > Make Single User**.
+
+### Fusionner
+
+<Steps>
+
+1. Dans **Base**, choisissez l'armature qui reste : généralement l'avatar.
+
+2. Dans **To Merge**, choisissez l'armature que vous ajoutez.
+
+3. Si Cats affiche **Armatures can be merged automatically!**, les deux partagent les noms de leurs os principaux et vous pouvez continuer. Sinon, choisissez dans **Attach to** l'os de l'armature de base auquel la nouvelle partie doit se rattacher.
+
+4. Réglez les options, puis cliquez sur **Merge Armatures**.
+
+</Steps>
+
+Cats affiche **Armatures successfully joined.** Les os portant le même nom sont fusionnés, et leurs poids s'additionnent.
+
+| Option                       | Par défaut | Ce qu'elle fait                                                                                                                                                                                                          |
+| ---------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Merge All Bones**          | Désactivé  | Fusionne tous les os portant le même nom, pas seulement les os principaux (Hips, Spine, etc.). Renommez les os à fusionner pour qu'ils correspondent. Vérifiez le résultat ensuite : cela peut avoir des effets de bord. |
+| **Apply Transforms**         | Désactivé  | Cochez-la si les deux modèles sont déjà exactement à leur place. Ils restent en place pendant la fusion.                                                                                                                 |
+| **Join Meshes**              | Activé     | Joint tous les maillages en un seul après la fusion.                                                                                                                                                                     |
+| **Remove Zero Weight Bones** | Activé     | Supprime les os qui ne déplacent aucun sommet après la fusion.                                                                                                                                                           |
+| **Cleanup Shape Keys**       | Activé     | Supprime les shape keys qui n'ont aucun effet. Décochez-la si des shape keys que vous voulez garder disparaissent.                                                                                                       |
+
+### Erreurs de transformation
+
+La fusion attend les deux armatures à la même échelle, et le modèle ajouté sans rotation. Sinon, Cats s'arrête avec **Transform Issue Detected!** Cochez **Apply Transforms**, ou sélectionnez les deux objets et appliquez leurs transformations avec <kbd>Ctrl</kbd> + <kbd>A</kbd> > **All Transforms**.
+
+Si une armature a un objet parent, ce parent doit être à la position 0, à la rotation 0 et à l'échelle 1, ou avoir ses transformations appliquées.
+
+## Attach Mesh
+
+Servez-vous-en pour les accessoires rigides : un chapeau, des lunettes, une arme. Le maillage ne doit pas encore avoir de parent.
+
+<Steps>
+
+1. Dans **Base**, choisissez l'armature.
+
+2. Dans **Mesh**, choisissez le maillage sans parent.
+
+3. Dans **Attach to**, choisissez l'os qu'il doit suivre, par exemple Head pour un chapeau.
+
+4. Cliquez sur **Attach Mesh**.
+
+</Steps>
+
+Cats parente le maillage à l'armature, crée sous l'os choisi un nouvel os portant le nom du maillage, et lui assigne tout le maillage avec un poids complet. Il affiche **Mesh successfully attached to armature.**
+
+<Aside type="caution">
+	Attach Mesh supprime les groupes de sommets existants du maillage et assigne chaque sommet à un
+	seul os. Cela ne convient qu'aux objets rigides : une veste ou une jupe a besoin de plusieurs os
+	et ne se déformera pas correctement. Appliquez d'abord l'échelle du maillage si elle n'est pas
+	uniforme.
+</Aside>
+
+Le bouton **How to use** en haut ouvre la documentation du projet en amont pour ce panneau.

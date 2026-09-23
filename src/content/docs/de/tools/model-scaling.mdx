@@ -1,0 +1,36 @@
+---
+title: Model Scaling
+description: Einen Avatar mit der Erweiterung Immersive Scaler, die das Panel Model Scaling einbettet, in der Größe ändern und seine Proportionen anpassen.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**Model Scaling** skaliert das Modell nicht selbst. Es zeigt die Oberfläche von **Immersive Scaler**, einer separaten Erweiterung, die Avatare auf eine Zielgröße bringt und ihre Proportionen für VR korrigiert.
+
+## Immersive Scaler installieren
+
+Das Panel zeigt an, was es gefunden hat:
+
+| Meldung                                | Vorgehen                                                                                                                     |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Immersive Scaler is not installed!** | Auf **Download Immersive Scaler** klicken, das Zip von der Release-Seite als Erweiterung installieren und dann zurückkehren. |
+| **Immersive Scaler is not enabled!**   | Auf **Enable Immersive Scaler** klicken. Cats deaktiviert ältere Kopien und aktiviert die aktuelle.                          |
+
+Cats benötigt Immersive Scaler 0.5.2 oder neuer. Sobald es installiert und aktiviert ist, erscheinen seine Bedienelemente direkt in diesem Panel.
+
+<Shot
+	name="panel-model-scaling"
+	alt="Das Panel Model Scaling mit einem Button Immersive Scaler Help, der Meldung Immersive Scaler is not installed und einem Button Download Immersive Scaler."
+	caption="Die Anzeige des Panels, solange Immersive Scaler nicht installiert ist."
+/>
+
+## Verwendung
+
+Die Bedienelemente gehören zu Immersive Scaler, daher ist dessen eigene Anleitung die Referenz: Oben im Panel auf **Immersive Scaler Help** klicken, um sie zu öffnen.
+
+<Aside type="tip">
+	Den Avatar vor dem Erstellen von Eye Tracking oder Visemen und vor dem Export skalieren. Eine
+	spätere Größenänderung kann Augenknochen und Shape Keys verschieben.
+</Aside>

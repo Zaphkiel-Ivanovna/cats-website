@@ -1,0 +1,69 @@
+---
+title: Quick start
+description: Take a model from import to a VRChat-ready FBX with Cats, step by step, and know which steps to skip for models already made for Unity.
+---
+
+import Shot from '../../../components/Shot.astro';
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+This guide takes a model through Cats from import to an FBX you can drop into Unity. It assumes Cats is [installed](../install/) and the CATS tab is open in the 3D Viewport sidebar (<kbd>N</kbd>).
+
+<Shot
+	name="hero"
+	alt="Blender 5.1 with a VRoid avatar in the viewport and the Quick Access and MMD Options panels open in the CATS tab."
+	caption="The CATS tab in the 3D Viewport sidebar, here with Quick Access and MMD Options open."
+/>
+
+## Which kind of model do you have?
+
+The path depends on where the model comes from:
+
+<Tabs>
+<TabItem label="Raw import (MMD, VRM...)">
+
+A model straight from MMD, VRM, XNALara or a game, with its original bones and physics. It needs the full treatment, including **Fix MMD Model**.
+
+</TabItem>
+<TabItem label="Made for Unity (Booth, Gumroad...)">
+
+An avatar already rigged for Unity and VRChat. **Do not run Fix MMD Model on it**: it would rename and delete bones the avatar relies on. Skip step 2 and use Cats for optimization, visemes and export.
+
+</TabItem>
+</Tabs>
+
+## From import to export
+
+<Steps>
+
+1. **Import the model.** In [Quick Access](../../tools/quick-access/), click **Import Model** and pick the file: `.pmx`, `.vrm`, `.fbx`, `.xps`, a `.zip`, and so on. Always import through Cats: Fix MMD Model expects the result of its own importer.
+
+2. **Fix it (raw imports only).** Open [MMD Options](../../tools/mmd-options/) and click **Fix MMD Model**. Cats translates and renames the bones onto a standard skeleton, merges helper bones, joins the meshes, cleans the shape keys and removes MMD physics. Check the result in Pose mode (step 6).
+
+3. **Translate what is left.** If materials, objects or shape keys still have Japanese names, click **All** under **Translate** in [Other Options](../../tools/other-options/).
+
+4. **Optimize.** In [Optimization](../../tools/optimization/):
+   - Click **Combine Same Materials** to merge identical materials.
+   - If more than four materials remain, build an atlas with Material Combiner in **Atlas Generation**.
+   - Make sure the model is a single mesh, or two at most: **Join Meshes > All**.
+   - Reduce physics bones with **Merge Bones** if you have many hair or skirt chains.
+
+5. **Add lip sync.** In [Visemes](../../tools/visemes/), pick three mouth shapes and click **Create Visemes** to get the fifteen `vrc.v_*` shape keys.
+
+6. **Check how it moves.** In [Quick Access](../../tools/quick-access/#pose-mode), click **Start Pose Mode** and rotate a few bones: arms, legs, head, fingers. Click **Stop Pose Mode** when you are done.
+
+7. **Prepare the eyes.** For VRChat, open [Eye Tracking](../../tools/eye-tracking/), pick both eye bones under **SDK3 Eye Tracking** and click **Rotate eye bones**. The rest of eye tracking is set up in Unity.
+
+8. **Export.** In [Quick Access](../../tools/quick-access/#export-model), click **Export Model**, then **Export Model** again in the popup. Read any warning Cats shows about polygons, materials or meshes: each one tells you what VRChat will complain about. Save the FBX.
+
+</Steps>
+
+## In Unity
+
+Drop the FBX into your Unity project, set the rig to **Humanoid** in the import settings, and add the VRChat avatar descriptor. Because Cats named the bones and shape keys the way Unity and the VRChat SDK expect, the humanoid mapping and the viseme auto-detect should fill in on their own.
+
+<Aside type="tip">
+	Keep the `.blend` file. If you need to change something later, it is much easier to fix it there
+	and export again than to redo the whole chain from the original model.
+</Aside>
+
+Something went wrong? See [Troubleshooting](../troubleshooting/).

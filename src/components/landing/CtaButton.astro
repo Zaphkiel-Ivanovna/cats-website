@@ -1,0 +1,63 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+	href: string;
+	icon: string;
+	variant?: 'primary' | 'secondary';
+}
+
+const { href, icon, variant = 'primary' } = Astro.props;
+---
+
+<a class:list={['cta', variant]} {href}>
+	<Icon name={icon} />
+	<slot />
+</a>
+
+<style>
+	.cta {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55rem;
+		padding: 0.8rem 1.2rem;
+		border-radius: var(--cats-radius-control);
+		font-weight: 600;
+		font-size: var(--sl-text-base);
+		line-height: 1;
+		white-space: nowrap;
+		text-decoration: none;
+		transition:
+			translate 0.25s var(--cats-ease),
+			background-color 0.25s var(--cats-ease),
+			border-color 0.25s var(--cats-ease);
+	}
+	.cta :global(svg) {
+		font-size: 1.15em;
+	}
+	.primary {
+		background: var(--cats-cta-bg);
+		color: var(--cats-cta-fg);
+	}
+	.primary:hover {
+		background: color-mix(in srgb, var(--cats-cta-bg) 88%, var(--sl-color-white));
+	}
+	.secondary {
+		color: var(--sl-color-white);
+		border: 1px solid var(--sl-color-gray-5);
+	}
+	.secondary:hover {
+		border-color: var(--sl-color-accent);
+	}
+	.cta:hover {
+		translate: 0 -1px;
+	}
+	.cta:active {
+		translate: 0;
+		scale: 0.98;
+	}
+	.cta:focus-visible {
+		outline: 2px solid var(--sl-color-accent);
+		outline-offset: 3px;
+	}
+</style>

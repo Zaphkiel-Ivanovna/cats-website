@@ -1,0 +1,54 @@
+---
+import { getEntry } from 'astro:content';
+import addon from '../../data/addon.json';
+import LandingHero from './LandingHero.astro';
+import WireBackground from './WireBackground.astro';
+import FixModelSection from './FixModelSection.astro';
+import PanelIndex from './PanelIndex.astro';
+import ForkSection from './ForkSection.astro';
+import InstallSteps from './InstallSteps.astro';
+import Credits from './Credits.astro';
+import FloorGrid from './FloorGrid.astro';
+import { fill } from './fill';
+import './landing.css';
+
+const { lang, locale } = Astro.locals.starlightRoute;
+const entry = (await getEntry('landing', lang)) ?? (await getEntry('landing', 'en'));
+if (!entry) throw new Error('Missing src/content/landing/en.yaml');
+const t = entry.data;
+
+const base = locale ? `/${locale}` : '';
+const vars = {
+	version: addon.version,
+	series: new Intl.ListFormat(lang, { type: 'conjunction' }).format(addon.blenderSeries),
+	file: addon.downloadName,
+};
+const downloadLabel = fill(t.hero.download, vars);
+---
+
+<div class="landing not-content">
+	<WireBackground />
+	<LandingHero
+		t={t.hero}
+		{vars}
+		downloadUrl={addon.downloadUrl}
+		{lang}
+		releases={t.releases}
+		docsHref={`${base}/guides/quick-start/`}
+	/>
+	<FixModelSection t={t.fixModel} {lang} />
+	<PanelIndex t={t.panels} {base} />
+	<ForkSection t={t.fork} {lang} repoUrl={addon.repoUrl} />
+	<div class="finale">
+		<FloorGrid />
+		<InstallSteps
+			t={t.install}
+			{vars}
+			downloadUrl={addon.downloadUrl}
+			{downloadLabel}
+			{lang}
+			releases={t.releases}
+		/>
+		<Credits t={t.credits} repoUrl={addon.repoUrl} />
+	</div>
+</div>

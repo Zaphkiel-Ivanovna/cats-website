@@ -1,0 +1,124 @@
+---
+title: Eye Tracking
+description: Prepare eye bones for VRChat SDK3 eye tracking, or build the legacy bone and shape key setup other games still use.
+---
+
+import Shot from '../../../components/Shot.astro';
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+The **Eye Tracking** panel has two parts, and which one you need depends on where the avatar goes:
+
+| Part                    | Use it for                                               | What it does                                                                                     |
+| ----------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **SDK3 Eye Tracking**   | VRChat avatars (Avatars 3.0)                             | Rotates the eye bones so that setting up eye look in Unity is simple.                            |
+| **Legacy Eye Tracking** | ChilloutVR and other games that still read the old setup | Builds new `LeftEye` and `RightEye` bones and the `vrc.blink_*` and `vrc.lowerlid_*` shape keys. |
+
+<Aside type="danger" title="Do not use Legacy Eye Tracking for VRChat">
+	VRChat sets up eye tracking in Unity, through the avatar descriptor. The legacy setup was made for
+	the old SDK and should not be used on VRChat SDK3 avatars.
+</Aside>
+
+## SDK3 Eye Tracking
+
+For VRChat, all Cats has to do is point the eye bones straight up with no roll. Unity's eye look settings then behave the same on every model.
+
+<Shot
+	name="panel-eye-sdk3"
+	alt="The SDK3 Eye Tracking section with Left Eye set to Eye_L, Right Eye set to Eye_R, and the Rotate eye bones button."
+/>
+
+<Steps>
+
+1. In **Left Eye** and **Right Eye**, pick the model's eye bones. After [Fix MMD Model](../mmd-options/) they are named `Eye_L` and `Eye_R`.
+
+2. Click **Rotate eye bones**.
+
+</Steps>
+
+Cats reports **Eye bones rotated.**, or **Eye bones are already rotated for VRChat, no changes were made.** if there was nothing to do. It keeps each bone's head where it was, disconnects child bones that were attached to the eyes, and turns X-Axis Mirror back on afterwards if you had it on.
+
+The button is disabled until both eye bones are set. If another object is in Edit mode, exit it first or open the armature in Edit mode.
+
+## Legacy Eye Tracking
+
+The legacy setup adds eye movement and blinking through bones and shape keys. It has two modes: you create it, then Cats switches the panel to testing.
+
+<Shot
+	name="panel-eye-legacy"
+	alt="The Legacy Eye Tracking section in creation mode: Head, Left Eye and Right Eye bones, four blink and lower lid shape keys, the two Disable options, Eye Movement Range and Create Eye Tracking."
+/>
+
+### Requirements
+
+Cats checks these before it starts, and stops at the first one that fails:
+
+- The mesh with the eyes is parented to the armature and has shape keys.
+- The mesh has vertex groups for both eyes, with names containing `LeftEye`, `Eye_L`, `eye.L`, `EyeLeft`, `left_eye` or `l_eye`, and the right-side equivalents.
+- The **Head**, **Left Eye** and **Right Eye** bones exist in the armature.
+- The bone chain runs exactly **Hips > Spine > Chest > Neck > Head**.
+- For the game to find it, the armature must be named `Armature` and the mesh with the eyes `Body`. Cats renames the armature to `Armature` when it creates eye tracking, and **Join all meshes** in [Quick Access](../quick-access/) names the joined mesh `Body`.
+
+Do any decimation **before** this step. Cats creates new eye bones from the current vertex groups, so later mesh changes can break them.
+
+### Create it
+
+<Steps>
+
+1. Pick the **Mesh** with the eyes, if there is more than one.
+
+2. Set **Head**, **Left Eye** and **Right Eye** to the existing bones.
+
+3. Set the four shape keys:
+
+   | Field              | Shape key                                                                         |
+   | ------------------ | --------------------------------------------------------------------------------- |
+   | **Blink Left**     | The left eye closed.                                                              |
+   | **Blink Right**    | The right eye closed.                                                             |
+   | **Lowerlid Left**  | The left lower lid slightly raised. Set it to `Basis` to skip lower lid movement. |
+   | **Lowerlid Right** | Same for the right side.                                                          |
+
+4. Adjust the options if needed:
+   - **Disable Eye Blinking** keeps only eye movement. Cats still creates the blink keys, but empty.
+   - **Disable Eye Movement** keeps only blinking. You cannot tick both.
+   - **Eye Movement Range** (default `0.8`) sets how far the eyes can turn. Too little or too much makes them glitch.
+
+5. Click **Create Eye Tracking**.
+
+</Steps>
+
+Cats creates two new bones, `LeftEye` and `RightEye`, parented to Head and pointing up. Each new bone is placed between the old eye bone and the centre of the eye mesh, depending on **Eye Movement Range**. It then copies the eye vertex groups to the new bones and builds `vrc.blink_left`, `vrc.blink_right`, `vrc.lowerlid_left` and `vrc.lowerlid_right` from your shape keys, replacing older ones with the same names.
+
+When it succeeds, it reports **Created eye tracking!** and the panel switches to testing. If the bone chain is wrong, Cats names the bone that is not parented correctly and stays in creation mode.
+
+### Test it
+
+<Tabs>
+<TabItem label="Eye movement">
+
+1. Click **Start Eye Testing**. Cats enters Pose mode, resets every pose and hides every bone except the two eyes.
+2. Move **Up - Down** and **Left - Right** to look around. The values are in degrees.
+3. If the eyes go too far or not far enough, change **Eye Movement Range** and click **Set Range**. Cats moves the eye bones again and keeps the new range.
+4. Click **Reset Rotation** to look straight ahead again.
+
+</TabItem>
+<TabItem label="Blinking">
+
+1. Set **Blink Strength** and click **Test** next to it to preview both blink keys together.
+2. Do the same with **Lowerlid Strength** for the lower lids.
+3. Click **Reset Shapes** to set every shape key back to 0.
+
+</TabItem>
+</Tabs>
+
+Click **Stop Eye Testing** when you are done: it unhides the bones, clears the test pose and returns to Object mode. **Reset Eye Tracking Panel** takes the panel back to creation mode. In the game or engine, remember to assign `LeftEye` and `RightEye` as the eye bones.
+
+### Troubleshooting
+
+The panel keeps a short checklist, and it covers most failures:
+
+- The mesh has eye vertex groups, with the names listed above.
+- The shape keys are named correctly and selected in the fields.
+- The eye bones are actually weighted to the eyes. In Pose mode, rotating them should move the eyes.
+- The armature is in rest position.
+
+If **Set Range** reports that a bone has no vertex group or no vertices assigned, you picked the wrong mesh or the wrong bone, or the meshes were not joined before creating eye tracking.

@@ -1,0 +1,46 @@
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
+
+:root {
+	--sl-font: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+	--sl-font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	--sl-color-accent-low: #3a1d0c;
+	--sl-color-accent: #f5792a;
+	--sl-color-accent-high: #ffb583;
+	--sl-color-white: #f3f5f8;
+	--sl-color-gray-1: #dde2e9;
+	--sl-color-gray-2: #aeb7c3;
+	--sl-color-gray-3: #7d8796;
+	--sl-color-gray-4: #3b4552;
+	--sl-color-gray-5: #232b36;
+	--sl-color-gray-6: #151b23;
+	--sl-color-black: #0d1117;
+
+	--cats-radius-control: 8px;
+	--cats-cta-bg: var(--sl-color-accent);
+	--cats-cta-fg: #0d1117;
+	--cats-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #fde4d2;
+	--sl-color-accent: #b8480a;
+	--sl-color-accent-high: #7a2f06;
+	--sl-color-white: #0d1117;
+	--sl-color-gray-1: #1c2230;
+	--sl-color-gray-2: #353d4b;
+	--sl-color-gray-3: #5b6472;
+	--sl-color-gray-4: #8a939f;
+	--sl-color-gray-5: #c9d0d9;
+	--sl-color-gray-6: #e7ebf0;
+	--sl-color-gray-7: #f3f5f8;
+	--sl-color-black: #fbfcfd;
+
+	--cats-cta-bg: #b8480a;
+	--cats-cta-fg: #ffffff;
+}
+
+html {
+	overflow-x: clip;
+}

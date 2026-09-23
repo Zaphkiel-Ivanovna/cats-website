@@ -1,0 +1,5 @@
+yarn.lock
+.yarn/
+dist/
+.astro/
+node_modules/

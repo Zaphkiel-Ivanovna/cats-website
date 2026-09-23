@@ -1,0 +1,105 @@
+---
+const WIDTH = 1600;
+const HEIGHT = 1100;
+const STEP = 96;
+
+let seed = 7;
+const random = () => {
+	seed = (seed * 16807) % 2147483647;
+	return (seed - 1) / 2147483646;
+};
+
+const cols = Math.ceil(WIDTH / STEP) + 2;
+const rows = Math.ceil(HEIGHT / STEP) + 2;
+const grid: [number, number][][] = [];
+for (let r = 0; r < rows; r++) {
+	const row: [number, number][] = [];
+	for (let c = 0; c < cols; c++) {
+		const shift = r % 2 ? STEP / 2 : 0;
+		row.push([
+			Math.round((c - 1) * STEP + shift + (random() - 0.5) * STEP * 0.55),
+			Math.round((r - 1) * STEP * 0.87 + (random() - 0.5) * STEP * 0.5),
+		]);
+	}
+	grid.push(row);
+}
+
+const segments: string[] = [];
+const line = ([x1, y1]: [number, number], [x2, y2]: [number, number]) =>
+	segments.push(`M${x1} ${y1}L${x2} ${y2}`);
+for (let r = 0; r < rows; r++) {
+	for (let c = 0; c < cols; c++) {
+		if (c + 1 < cols) line(grid[r][c], grid[r][c + 1]);
+		if (r + 1 < rows) {
+			line(grid[r][c], grid[r + 1][c]);
+			const diagonal = r % 2 ? c + 1 : c - 1;
+			if (diagonal >= 0 && diagonal < cols) line(grid[r][c], grid[r + 1][diagonal]);
+		}
+	}
+}
+
+const accents = grid.flat().filter(() => random() < 0.06);
+---
+
+<div class="wire-bg" aria-hidden="true">
+	<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="xMidYMin slice">
+		<path d={segments.join('')} />
+		{accents.map(([cx, cy]) => (
+			<circle {cx} {cy} r="2.2" />
+		))}
+	</svg>
+</div>
+
+<style>
+	.wire-bg {
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: -1;
+		width: 100%;
+		height: min(1100px, 130vh);
+		overflow: hidden;
+		pointer-events: none;
+		-webkit-mask-image: radial-gradient(ellipse 65% 70% at 72% 18%, #000 0%, transparent 72%);
+		mask-image: radial-gradient(ellipse 65% 70% at 72% 18%, #000 0%, transparent 72%);
+	}
+	svg {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+	path {
+		fill: none;
+		stroke: var(--sl-color-gray-4);
+		stroke-width: 1;
+		vector-effect: non-scaling-stroke;
+		opacity: 0.4;
+	}
+	circle {
+		fill: var(--sl-color-accent);
+		opacity: 0.35;
+	}
+	:global(:root[data-theme='light']) path {
+		stroke: var(--sl-color-gray-5);
+		opacity: 0.7;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.wire-bg {
+			animation: wire-in 1.6s ease-out both;
+		}
+	}
+	@keyframes wire-in {
+		from {
+			opacity: 0;
+		}
+	}
+
+	@media (max-width: 50rem) {
+		.wire-bg {
+			height: 90vh;
+			-webkit-mask-image: radial-gradient(ellipse 90% 55% at 60% 15%, #000 0%, transparent 75%);
+			mask-image: radial-gradient(ellipse 90% 55% at 60% 15%, #000 0%, transparent 75%);
+		}
+	}
+</style>

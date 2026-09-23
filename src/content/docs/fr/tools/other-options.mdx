@@ -1,0 +1,71 @@
+---
+title: Other Options
+description: Traduisez les noms japonais en anglais, séparez les maillages, corrigez les normales, et profitez d'outils supplémentaires pour les shape keys, les os de torsion et les jambes.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+**Other Options** (autres options) regroupe les outils qui n'ont pas leur place ailleurs. Le panneau est replié au départ, et un interrupteur **Show More Options** révèle une seconde série d'outils.
+
+<Shot
+	name="panel-other-options"
+	alt="Le panneau Other Options avec Show More Options activé : Separate by, Translate, Normals, outils de shape keys et d'os."
+	caption="Other Options avec Show More Options activé."
+/>
+
+## Separate by
+
+Sépare le maillage actif, ou l'unique maillage du modèle :
+
+- **Materials** crée un maillage par matériau.
+- **Loose Parts** crée un maillage par morceau déconnecté, pour un contrôle plus fin.
+- **Shapes** coupe le maillage en deux : la partie déplacée par les shape keys, et le reste. Pratique avant une décimation manuelle, puisque vous pouvez alors décimer la partie statique sans toucher au visage.
+
+<Aside type="caution">
+	Ne décimez jamais une partie qui pourrait avoir besoin de shape keys plus tard : visage, bouche,
+	yeux.
+</Aside>
+
+## Translate
+
+Les modèles MMD arrivent généralement avec des noms japonais. Ces boutons les traduisent en anglais :
+
+- **All** traduit les os, les shape keys, les objets et les matériaux, dans cet ordre.
+- **Shape Keys**, **Objects**, **Bones** et **Materials** traduisent un seul type de nom.
+
+Cats cherche d'abord les noms dans son dictionnaire intégré, puis envoie le reste à Google Translate. Les résultats de Google sont mis en cache sur votre ordinateur : un même nom n'est envoyé qu'une fois. Les os et les shape keys sont traduits sur **toutes** les armatures et tous les maillages du fichier, pas seulement sur le modèle sélectionné. Les shape keys qui commencent par `vrc.` ne sont jamais modifiées.
+
+Deux options changent la façon dont les shape keys sont traduites :
+
+- **Use Old Translations (not recommended)** ignore le dictionnaire et n'utilise que Google, comme Cats 0.9.0 et antérieur. Ne l'utilisez que si vous avez des animations qui dépendent des anciens noms.
+- **Skip Locked Shape Keys** laisse intactes les shape keys que vous avez verrouillées avec l'icône de cadenas dans la liste des shape keys de Blender.
+
+Si Google est injoignable ou vous bloque un moment, Cats applique quand même son dictionnaire et signale que certaines parties n'ont pas pu être traduites. Réessayez plus tard pour le reste. Vous pouvez vider le cache dans [Settings & Updates](../settings/).
+
+## Show More Options
+
+### Normales
+
+- **Recalculate** réoriente vers l'extérieur les normales du maillage actif. Utilisez-le quand certaines faces semblent inversées ou plus sombres. Ne l'utilisez pas sur des maillages qui s'affichent déjà correctement.
+- **Flip** inverse toutes les normales, pour les maillages entièrement retournés.
+
+### Transformations
+
+**Apply Transformations** applique la position, la rotation et l'échelle à l'armature et à ses maillages. Le petit bouton à côté les applique à tous les objets de la scène.
+
+### Shape keys
+
+- **Remove Unused Shapekeys** supprime les shape keys du maillage actif qui ne déplacent aucun sommet. `vrc.v_sil` est toujours conservée. Le maillage doit être sélectionné, en mode Object.
+- **Repair Broken Shapekeys** tente de réparer les shape keys endommagées par certaines opérations de Blender.
+- **Optimize Static Shapekeys** déplace dans son propre maillage la partie que les shape keys affectent, et retire les shape keys du reste, renommé `Static`. Cela réduit le coût GPU de l'avatar. Joignez d'abord vos maillages : Cats refuse de s'exécuter sur plusieurs maillages.
+- **Fix Koikatsu Shapekeys** répare les shape keys des modèles issus de Koikatsu.
+
+Le menu des shape keys dans les propriétés Object Data de Blender gagne aussi deux entrées ajoutées par Cats : **Apply Selected Shapekey to Basis**, qui intègre la clé sélectionnée à Basis et garde une copie inversée, et **Remove Unused Shapekeys**.
+
+### Os
+
+- **Create Digitigrade Legs** transforme une jambe en jambe digitigrade, pour les avatars d'apparence animale. Sélectionnez d'abord deux os en mode Edit ; le lien **How to use** ouvre un tutoriel.
+- **Generate Twist Bones** ajoute des os de torsion aux os sélectionnés et répartit leurs poids. **Upper Body** couvre aussi la colonne et le cou.
+- **Convert Bones To Valve** renomme les os principaux avec les noms de Source Engine. Le modèle doit d'abord avoir les noms standard issus de [Fix MMD Model](../mmd-options/).

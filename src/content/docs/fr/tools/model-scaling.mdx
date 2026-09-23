@@ -1,0 +1,36 @@
+---
+title: Model Scaling
+description: Redimensionnez un avatar et ajustez ses proportions avec l'extension Immersive Scaler, qu'accueille le panneau Model Scaling.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**Model Scaling** ne redimensionne pas le modèle par lui-même. Il affiche l'interface d'**Immersive Scaler**, une extension séparée conçue pour redimensionner les avatars à une taille cible et corriger leurs proportions pour la VR.
+
+## Installer Immersive Scaler
+
+Le panneau vous indique ce qu'il a trouvé :
+
+| Message                                | Que faire                                                                                                         |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Immersive Scaler is not installed!** | Cliquez sur **Download Immersive Scaler**, installez comme extension le zip de sa page de versions, puis revenez. |
+| **Immersive Scaler is not enabled!**   | Cliquez sur **Enable Immersive Scaler**. Cats désactive les anciennes copies et active la version actuelle.       |
+
+Cats nécessite Immersive Scaler 0.5.2 ou plus récent. Une fois installé et activé, ses commandes apparaissent directement dans ce panneau.
+
+<Shot
+	name="panel-model-scaling"
+	alt="Le panneau Model Scaling avec un bouton Immersive Scaler Help, le message Immersive Scaler is not installed et un bouton Download Immersive Scaler."
+	caption="Ce qu'affiche le panneau tant qu'Immersive Scaler n'est pas installé."
+/>
+
+## L'utiliser
+
+Les commandes appartiennent à Immersive Scaler, dont le guide fait donc référence : cliquez sur **Immersive Scaler Help** en haut du panneau pour l'ouvrir.
+
+<Aside type="tip">
+	Redimensionnez l'avatar avant de créer le suivi oculaire ou les visèmes, et avant d'exporter.
+	Changer la taille ensuite peut décaler les os des yeux et les shape keys.
+</Aside>

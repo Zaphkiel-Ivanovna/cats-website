@@ -1,0 +1,125 @@
+---
+title: Eye Tracking
+description: Prepara le ossa degli occhi per l'eye tracking SDK3 di VRChat, oppure crea la configurazione legacy di ossa e shape key che altri giochi usano ancora.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Il pannello **Eye Tracking** ha due parti, e quella che ti serve dipende da dove andrà l'avatar:
+
+| Parte                   | Usala per                                                              | Cosa fa                                                                                    |
+| ----------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **SDK3 Eye Tracking**   | Avatar VRChat (Avatars 3.0)                                            | Ruota le ossa degli occhi così configurare lo sguardo in Unity è semplice.                 |
+| **Legacy Eye Tracking** | ChilloutVR e altri giochi che leggono ancora la vecchia configurazione | Crea le nuove ossa `LeftEye` e `RightEye` e le shape key `vrc.blink_*` e `vrc.lowerlid_*`. |
+
+<Aside type="danger" title="Non usare Legacy Eye Tracking per VRChat">
+	VRChat configura l'eye tracking in Unity, tramite l'avatar descriptor. La configurazione legacy
+	era pensata per il vecchio SDK e non va usata sugli avatar VRChat SDK3.
+</Aside>
+
+## SDK3 Eye Tracking
+
+Per VRChat, a Cats basta orientare le ossa degli occhi dritte verso l'alto, senza roll. Le impostazioni dello sguardo di Unity si comportano poi allo stesso modo su ogni modello.
+
+<Shot
+	name="panel-eye-sdk3"
+	alt="La sezione SDK3 Eye Tracking con Left Eye impostato su Eye_L, Right Eye impostato su Eye_R e il pulsante Rotate eye bones."
+/>
+
+<Steps>
+
+1. In **Left Eye** e **Right Eye**, scegli le ossa degli occhi del modello. Dopo [Fix MMD Model](../mmd-options/) si chiamano `Eye_L` e `Eye_R`.
+
+2. Clicca **Rotate eye bones**.
+
+</Steps>
+
+Cats segnala **Eye bones rotated.**, oppure **Eye bones are already rotated for VRChat, no changes were made.** se non c'era niente da fare. Mantiene la testa di ogni osso dov'era, scollega le ossa figlie che erano attaccate agli occhi e riattiva X-Axis Mirror alla fine se l'avevi attivo.
+
+Il pulsante resta disattivato finché non sono impostate entrambe le ossa degli occhi. Se un altro oggetto è in modalità Edit, esci prima oppure apri l'armatura in modalità Edit.
+
+## Legacy Eye Tracking
+
+La configurazione legacy aggiunge movimento degli occhi e ammiccamento tramite ossa e shape key. Ha due modalità: prima la crei, poi Cats passa il pannello in modalità test.
+
+<Shot
+	name="panel-eye-legacy"
+	alt="La sezione Legacy Eye Tracking in modalità di creazione: le ossa Head, Left Eye e Right Eye, quattro shape key per ammiccamento e palpebra inferiore, le due opzioni Disable, Eye Movement Range e Create Eye Tracking."
+/>
+
+### Requisiti
+
+Cats li verifica prima di partire e si ferma al primo che non è soddisfatto:
+
+- La mesh con gli occhi è imparentata all'armatura e ha delle shape key.
+- La mesh ha vertex group per entrambi gli occhi, con nomi che contengono `LeftEye`, `Eye_L`, `eye.L`, `EyeLeft`, `left_eye` o `l_eye`, e gli equivalenti per il lato destro.
+- Le ossa **Head**, **Left Eye** e **Right Eye** esistono nell'armatura.
+- La catena di ossa è esattamente **Hips > Spine > Chest > Neck > Head**.
+- Perché il gioco la trovi, l'armatura deve chiamarsi `Armature` e la mesh con gli occhi `Body`. Cats rinomina l'armatura in `Armature` quando crea l'eye tracking, e **Join all meshes** in [Quick Access](../quick-access/) chiama `Body` la mesh unita.
+
+Fai qualsiasi decimazione **prima** di questo passaggio. Cats crea le nuove ossa degli occhi a partire dai vertex group attuali, quindi modifiche successive alla mesh possono romperle.
+
+### Creala
+
+<Steps>
+
+1. Scegli la **Mesh** con gli occhi, se ce n'è più di una.
+
+2. Imposta **Head**, **Left Eye** e **Right Eye** sulle ossa esistenti.
+
+3. Imposta le quattro shape key:
+
+   | Campo              | Shape key                                                                                                                     |
+   | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+   | **Blink Left**     | L'occhio sinistro chiuso.                                                                                                     |
+   | **Blink Right**    | L'occhio destro chiuso.                                                                                                       |
+   | **Lowerlid Left**  | La palpebra inferiore sinistra leggermente sollevata. Impostala su `Basis` per saltare il movimento della palpebra inferiore. |
+   | **Lowerlid Right** | Lo stesso per il lato destro.                                                                                                 |
+
+4. Regola le opzioni se serve:
+   - **Disable Eye Blinking** mantiene solo il movimento degli occhi. Cats crea comunque le chiavi di ammiccamento, ma vuote.
+   - **Disable Eye Movement** mantiene solo l'ammiccamento. Non puoi spuntarle entrambe.
+   - **Eye Movement Range** (predefinito `0.8`) stabilisce quanto possono girare gli occhi. Troppo poco o troppo causa glitch.
+
+5. Clicca **Create Eye Tracking**.
+
+</Steps>
+
+Cats crea due nuove ossa, `LeftEye` e `RightEye`, imparentate a Head e rivolte verso l'alto. Ogni nuovo osso viene posizionato tra il vecchio osso dell'occhio e il centro della mesh dell'occhio, in base a **Eye Movement Range**. Poi copia i vertex group degli occhi sulle nuove ossa e costruisce `vrc.blink_left`, `vrc.blink_right`, `vrc.lowerlid_left` e `vrc.lowerlid_right` dalle tue shape key, sostituendo quelle più vecchie con gli stessi nomi.
+
+Se tutto va a buon fine, segnala **Created eye tracking!** e il pannello passa in modalità test. Se la catena di ossa è sbagliata, Cats indica l'osso non imparentato correttamente e resta in modalità creazione.
+
+### Testala
+
+<Tabs>
+<TabItem label="Movimento degli occhi">
+
+1. Clicca **Start Eye Testing**. Cats entra in modalità Pose, azzera ogni posa e nasconde tutte le ossa tranne i due occhi.
+2. Muovi **Up - Down** e **Left - Right** per guardarti intorno. I valori sono in gradi.
+3. Se gli occhi vanno troppo o troppo poco lontano, cambia **Eye Movement Range** e clicca **Set Range**. Cats sposta di nuovo le ossa degli occhi e mantiene il nuovo intervallo.
+4. Clicca **Reset Rotation** per tornare a guardare dritto davanti.
+
+</TabItem>
+<TabItem label="Ammiccamento">
+
+1. Imposta **Blink Strength** e clicca **Test** accanto per vedere in anteprima le due chiavi di ammiccamento insieme.
+2. Fai lo stesso con **Lowerlid Strength** per le palpebre inferiori.
+3. Clicca **Reset Shapes** per riportare ogni shape key a 0.
+
+</TabItem>
+</Tabs>
+
+Clicca **Stop Eye Testing** quando hai finito: mostra di nuovo le ossa, cancella la posa di test e torna in modalità Object. **Reset Eye Tracking Panel** riporta il pannello in modalità creazione. Nel gioco o nel motore, ricordati di assegnare `LeftEye` e `RightEye` come ossa degli occhi.
+
+### Risoluzione dei problemi
+
+Il pannello mostra una breve checklist che copre la maggior parte dei problemi:
+
+- La mesh ha i vertex group degli occhi, con i nomi elencati sopra.
+- Le shape key hanno i nomi giusti e sono selezionate nei campi.
+- Le ossa degli occhi pesano davvero sugli occhi. In modalità Pose, ruotarle dovrebbe muovere gli occhi.
+- L'armatura è in posizione di riposo.
+
+Se **Set Range** segnala che un osso non ha vertex group o vertici assegnati, hai scelto la mesh o l'osso sbagliato, oppure le mesh non erano state unite prima di creare l'eye tracking.

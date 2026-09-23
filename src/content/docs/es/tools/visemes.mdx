@@ -1,0 +1,102 @@
+---
+title: Visemes
+description: Genera las quince shape keys de sincronización labial vrc.v_* que lee VRChat, a partir de tres formas de boca que tu modelo ya tiene.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+VRChat controla la sincronización labial con quince shape keys llamadas de `vrc.v_aa` a `vrc.v_th`. La mayoría de los modelos solo traen unas pocas formas de boca. El panel **Visemes** crea las quince mezclando tres formas que tú eliges: una "aa" abierta, una "oh" redondeada y una "ch" con los dientes apretados.
+
+El panel empieza plegado en la pestaña CATS.
+
+## Antes de empezar
+
+- La malla con las shape keys de la boca debe estar emparentada con la armadura. Cats solo muestra las mallas que son hijas de la armadura del modelo, así que una malla suelta te da **No meshes found!**.
+- Une antes las mallas, para que la cara quede en una sola malla con todas sus shape keys. [Fix MMD Model](../mmd-options/) lo hace en las importaciones recientes de MMD y VRM, y **Join all meshes** en [Quick Access](../quick-access/) lo hace en cualquier modelo.
+- Busca tres shape keys que muevan de verdad la boca. En los modelos de MMD suelen ser `あ`, `お` e `い` antes de traducir, o `A`, `O` e `I` después.
+
+## Crear los visemas
+
+<Steps>
+
+1. Abre **Visemes** en la pestaña CATS. Si el modelo tiene más de una malla, elige en **Mesh** la que tiene la boca.
+
+2. Asigna las tres formas de boca:
+
+   | Campo         | Elige la shape key en la que la boca…                                  |
+   | ------------- | ---------------------------------------------------------------------- |
+   | **Viseme AA** | está muy abierta, como al decir "aa".                                  |
+   | **Viseme OH** | está redondeada, como al decir "oh".                                   |
+   | **Viseme CH** | tiene los labios abiertos y los dientes apretados, como al decir "ch". |
+
+   Cats rellena de antemano estos campos con nombres comunes como `MTH A`, `Ah` o `A`. Revisa cada uno: un nombre prerrellenado es una suposición, y puede apuntar a una shape key que tu malla no tiene.
+
+3. Deja **Shape Key Mix Intensity** en `1.0` para una primera prueba. Bájalo si la boca se abre demasiado y súbelo si la sincronización labial se ve floja. Va de 0 a 10.
+
+4. Haz clic en **Preview Visemes** y recorre los sonidos del desplegable para ver cada mezcla en el modelo. Haz clic en **Stop Preview** para dejar las shape keys como estaban.
+
+5. Haz clic en **Create Visemes**. Cats muestra **Created mouth visemes!** cuando termina.
+
+</Steps>
+
+<Shot
+	name="panel-visemes"
+	alt="El panel Visemes con Viseme AA, OH y CH asignados a Fcl_MTH_A, Fcl_MTH_O y Fcl_MTH_I, Shape Key Mix Intensity en 1.00 y el botón Create Visemes."
+	caption="Las tres formas de boca de un modelo de VRoid elegidas en el panel."
+/>
+
+<Aside type="caution" title="Nunca elijas Basis">
+	Basis es la forma neutra y no mueve la boca. Cats se niega a continuar con **Please select the
+	correct mouth shapekeys instead of "Basis"!**
+</Aside>
+
+## Cómo se mezcla cada visema
+
+Cada shape key resultante es una mezcla de tus tres formas. Los pesos de abajo se multiplican por **Shape Key Mix Intensity**.
+
+<Shot
+	name="visemes-faces"
+	alt="La misma cara tres veces: con la boca muy abierta, redondeada y con los labios separados sobre los dientes apretados."
+	caption="vrc.v_aa, vrc.v_oh y vrc.v_ch, generados a partir de una cara de VRoid."
+/>
+
+| Shape key   | AA     | OH     | CH     |
+| ----------- | ------ | ------ | ------ |
+| `vrc.v_aa`  | 1      |        |        |
+| `vrc.v_ch`  |        |        | 1      |
+| `vrc.v_dd`  | 0.3    |        | 0.7    |
+| `vrc.v_e`   | 0.5    |        | 0.2    |
+| `vrc.v_ff`  | 0.2    |        | 0.4    |
+| `vrc.v_ih`  |        | 0.3    | 0.7    |
+| `vrc.v_kk`  | 0.7    |        | 0.4    |
+| `vrc.v_nn`  | 0.2    |        | 0.7    |
+| `vrc.v_oh`  | 0.2    | 0.8    |        |
+| `vrc.v_ou`  |        | 1      |        |
+| `vrc.v_pp`  | mínimo | mínimo |        |
+| `vrc.v_rr`  |        | 0.3    | 0.5    |
+| `vrc.v_sil` | mínimo |        | mínimo |
+| `vrc.v_ss`  |        |        | 0.8    |
+| `vrc.v_th`  | 0.4    | 0.15   |        |
+
+`vrc.v_pp` y `vrc.v_sil` son bocas casi cerradas. Cats les da un peso muy pequeño para que no haya dos shape keys exactamente iguales.
+
+## Qué más cambia
+
+Crear los visemas hace algo más que añadir quince shape keys. Ten en cuenta estos efectos secundarios:
+
+- Si ya existe una shape key con el mismo nombre, como un antiguo `vrc.v_aa`, se borra y se vuelve a crear.
+- Las shape keys se ordenan: primero Basis, luego las `vrc.blink_*` y `vrc.lowerlid_*` de [Eye Tracking](../eye-tracking/) y después los visemas.
+- El objeto de la armadura se renombra a `Armature`, y se elimina el Empty que sea padre de la armadura.
+- Mientras se ejecuta, todos los objetos se vuelven visibles y pasan al modo Object.
+
+## Si algo no se ve bien
+
+- **La boca se rasga o se estira.** Baja **Shape Key Mix Intensity** y vuelve a crear los visemas. Cats también puede avisar de que un visema deforma mucho la malla, cuando un vértice se mueve un 40 % o más del tamaño de la malla.
+- **Volver a ejecutarlo no parece cambiar nada.** Cats recuerda las mezclas que ya ha creado durante la sesión actual de Blender. Si vuelves a crear los visemas con las mismas tres shape keys de origen, algunos pueden omitirse. Reinicia Blender antes de probar otra intensidad.
+- **El panel muestra `VisemePanel.error.noShapekeys`.** Ese texto en bruto significa que la malla seleccionada no tiene ninguna shape key. Elige la malla que contiene la cara.
+
+## Siguiente paso
+
+En Unity, abre el descriptor del avatar, pon **Lip Sync** en **Viseme Blend Shape** y selecciona la malla. Como las shape keys usan los nombres `vrc.v_*`, la detección automática del SDK rellena todas las ranuras de visemas por ti.

@@ -1,0 +1,125 @@
+---
+title: Eye Tracking
+description: Przygotuj kości oczu do śledzenia oczu w VRChat SDK3 lub zbuduj starszy układ kości i shape keys, z którego nadal korzystają inne gry.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Panel **Eye Tracking** ma dwie części, a wybór zależy od tego, dokąd trafi awatar:
+
+| Część                   | Zastosowanie                                             | Działanie                                                                                  |
+| ----------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **SDK3 Eye Tracking**   | Awatary VRChat (Avatars 3.0)                             | Obraca kości oczu tak, aby konfiguracja kierunku spojrzenia w Unity była prosta.           |
+| **Legacy Eye Tracking** | ChilloutVR i inne gry, które nadal odczytują stary układ | Tworzy nowe kości `LeftEye` i `RightEye` oraz shape keys `vrc.blink_*` i `vrc.lowerlid_*`. |
+
+<Aside type="danger" title="Nie używaj Legacy Eye Tracking w VRChat">
+	VRChat konfiguruje śledzenie oczu w Unity, przez deskryptor awatara. Starszy układ powstał dla
+	dawnego SDK i nie należy go używać w awatarach VRChat SDK3.
+</Aside>
+
+## SDK3 Eye Tracking
+
+W przypadku VRChat Cats musi jedynie skierować kości oczu prosto w górę bez obrotu wokół osi (roll). Ustawienia spojrzenia w Unity działają wtedy tak samo w każdym modelu.
+
+<Shot
+	name="panel-eye-sdk3"
+	alt="Sekcja SDK3 Eye Tracking z Left Eye ustawionym na Eye_L, Right Eye ustawionym na Eye_R i przyciskiem Rotate eye bones."
+/>
+
+<Steps>
+
+1. W **Left Eye** i **Right Eye** wybierz kości oczu modelu. Po [Fix MMD Model](../mmd-options/) nazywają się `Eye_L` i `Eye_R`.
+
+2. Kliknij **Rotate eye bones**.
+
+</Steps>
+
+Cats zgłasza **Eye bones rotated.** albo **Eye bones are already rotated for VRChat, no changes were made.**, jeśli nie było nic do zrobienia. Zachowuje położenie głowy każdej kości, odłącza kości potomne przyczepione do oczu i ponownie włącza X-Axis Mirror, jeśli było wcześniej włączone.
+
+Przycisk jest nieaktywny, dopóki nie ustawisz obu kości oczu. Jeśli inny obiekt jest w trybie Edit, najpierw z niego wyjdź lub otwórz szkielet w trybie Edit.
+
+## Legacy Eye Tracking
+
+Starszy układ dodaje ruch oczu i mruganie za pomocą kości i shape keys. Ma dwa tryby: najpierw go tworzysz, a potem Cats przełącza panel w tryb testowania.
+
+<Shot
+	name="panel-eye-legacy"
+	alt="Sekcja Legacy Eye Tracking w trybie tworzenia: kości Head, Left Eye i Right Eye, cztery shape keys mrugania i dolnej powieki, dwie opcje Disable, Eye Movement Range i Create Eye Tracking."
+/>
+
+### Wymagania
+
+Cats sprawdza je przed rozpoczęciem i zatrzymuje się na pierwszym niespełnionym:
+
+- Siatka z oczami jest podpięta do szkieletu i ma shape keys.
+- Siatka ma grupy wierzchołków dla obu oczu, z nazwami zawierającymi `LeftEye`, `Eye_L`, `eye.L`, `EyeLeft`, `left_eye` lub `l_eye` oraz ich prawostronne odpowiedniki.
+- Kości **Head**, **Left Eye** i **Right Eye** istnieją w szkielecie.
+- Łańcuch kości ma dokładnie postać **Hips > Spine > Chest > Neck > Head**.
+- Aby gra go znalazła, szkielet musi nazywać się `Armature`, a siatka z oczami `Body`. Cats zmienia nazwę szkieletu na `Armature` podczas tworzenia śledzenia oczu, a **Join all meshes** w [Quick Access](../quick-access/) nadaje połączonej siatce nazwę `Body`.
+
+Wszelką decymację wykonaj **przed** tym krokiem. Cats tworzy nowe kości oczu na podstawie bieżących grup wierzchołków, więc późniejsze zmiany siatki mogą je zepsuć.
+
+### Tworzenie
+
+<Steps>
+
+1. Wybierz **Mesh** z oczami, jeśli jest więcej niż jedna siatka.
+
+2. Ustaw **Head**, **Left Eye** i **Right Eye** na istniejące kości.
+
+3. Ustaw cztery shape keys:
+
+   | Pole               | Shape key                                                                           |
+   | ------------------ | ----------------------------------------------------------------------------------- |
+   | **Blink Left**     | Zamknięte lewe oko.                                                                 |
+   | **Blink Right**    | Zamknięte prawe oko.                                                                |
+   | **Lowerlid Left**  | Lekko uniesiona lewa dolna powieka. Ustaw `Basis`, aby pominąć ruch dolnej powieki. |
+   | **Lowerlid Right** | To samo dla prawej strony.                                                          |
+
+4. W razie potrzeby dostosuj opcje:
+   - **Disable Eye Blinking** zachowuje tylko ruch oczu. Cats nadal tworzy klucze mrugania, ale puste.
+   - **Disable Eye Movement** zachowuje tylko mruganie. Nie można zaznaczyć obu.
+   - **Eye Movement Range** (domyślnie `0.8`) określa, jak daleko oczy mogą się obracać. Za mała lub za duża wartość powoduje błędy wyświetlania.
+
+5. Kliknij **Create Eye Tracking**.
+
+</Steps>
+
+Cats tworzy dwie nowe kości, `LeftEye` i `RightEye`, podpięte do Head i skierowane w górę. Każda nowa kość jest umieszczana między starą kością oka a środkiem siatki oka, zależnie od **Eye Movement Range**. Następnie Cats kopiuje grupy wierzchołków oczu do nowych kości i tworzy `vrc.blink_left`, `vrc.blink_right`, `vrc.lowerlid_left` i `vrc.lowerlid_right` z Twoich shape keys, zastępując starsze o tych samych nazwach.
+
+Po powodzeniu zgłasza **Created eye tracking!**, a panel przełącza się w tryb testowania. Jeśli łańcuch kości jest nieprawidłowy, Cats podaje nazwę kości, która nie jest poprawnie podpięta, i pozostaje w trybie tworzenia.
+
+### Testowanie
+
+<Tabs>
+<TabItem label="Ruch oczu">
+
+1. Kliknij **Start Eye Testing**. Cats przechodzi w tryb Pose, resetuje wszystkie pozy i ukrywa wszystkie kości oprócz dwóch kości oczu.
+2. Przesuwaj **Up - Down** i **Left - Right**, aby rozejrzeć się dookoła. Wartości są w stopniach.
+3. Jeśli oczy obracają się za daleko lub za mało, zmień **Eye Movement Range** i kliknij **Set Range**. Cats ponownie przesuwa kości oczu i zachowuje nowy zakres.
+4. Kliknij **Reset Rotation**, aby znów patrzeć prosto przed siebie.
+
+</TabItem>
+<TabItem label="Mruganie">
+
+1. Ustaw **Blink Strength** i kliknij **Test** obok, aby podejrzeć oba klucze mrugania jednocześnie.
+2. Zrób to samo z **Lowerlid Strength** dla dolnych powiek.
+3. Kliknij **Reset Shapes**, aby ustawić wszystkie shape keys z powrotem na 0.
+
+</TabItem>
+</Tabs>
+
+Na koniec kliknij **Stop Eye Testing**: przycisk odkrywa kości, czyści testową pozę i wraca do trybu Object. **Reset Eye Tracking Panel** przywraca panel do trybu tworzenia. W grze lub silniku pamiętaj, aby przypisać `LeftEye` i `RightEye` jako kości oczu.
+
+### Rozwiązywanie problemów
+
+Panel zawiera krótką listę kontrolną, która obejmuje większość niepowodzeń:
+
+- Siatka ma grupy wierzchołków oczu o nazwach wymienionych wyżej.
+- Shape keys mają poprawne nazwy i są wybrane w polach.
+- Kości oczu faktycznie mają wagi na oczach. W trybie Pose ich obrót powinien poruszać oczami.
+- Szkielet jest w pozycji spoczynkowej.
+
+Jeśli **Set Range** zgłasza, że kość nie ma grupy wierzchołków lub przypisanych wierzchołków, wybrano niewłaściwą siatkę lub kość albo siatki nie zostały połączone przed utworzeniem śledzenia oczu.

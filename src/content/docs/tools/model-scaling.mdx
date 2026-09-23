@@ -1,0 +1,35 @@
+---
+title: Model Scaling
+description: Resize an avatar and adjust its proportions with the Immersive Scaler add-on, which the Model Scaling panel hosts.
+---
+
+import Shot from '../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**Model Scaling** does not scale the model by itself. It shows the interface of **Immersive Scaler**, a separate add-on made for resizing avatars to a target height and fixing their proportions for VR.
+
+## Install Immersive Scaler
+
+The panel tells you what it found:
+
+| Message                                | What to do                                                                                                |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Immersive Scaler is not installed!** | Click **Download Immersive Scaler**, install the zip from its releases page as an add-on, then come back. |
+| **Immersive Scaler is not enabled!**   | Click **Enable Immersive Scaler**. Cats turns off older copies and enables the current one.               |
+
+Cats needs Immersive Scaler 0.5.2 or newer. Once it is installed and enabled, its controls appear directly in this panel.
+
+<Shot
+	name="panel-model-scaling"
+	alt="The Model Scaling panel with an Immersive Scaler Help button, the message Immersive Scaler is not installed, and a Download Immersive Scaler button."
+	caption="What the panel shows until Immersive Scaler is installed."
+/>
+
+## Use it
+
+The controls belong to Immersive Scaler, so its own guide is the reference: click **Immersive Scaler Help** at the top of the panel to open it.
+
+<Aside type="tip">
+	Scale the avatar before you create eye tracking or visemes, and before you export. Changing the
+	size afterwards can shift eye bones and shape keys.
+</Aside>

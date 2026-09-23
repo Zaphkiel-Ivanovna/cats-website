@@ -1,0 +1,25 @@
+.sidebar-content a[data-icon] {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+.sidebar-content a[data-icon]::before {
+	content: '';
+	flex: none;
+	width: 1rem;
+	height: 1rem;
+	background-color: currentColor;
+	opacity: 0.55;
+	-webkit-mask-size: contain;
+	mask-size: contain;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	transition: opacity 0.15s ease-out;
+}
+.sidebar-content a[data-icon]:hover::before {
+	opacity: 0.9;
+}
+.sidebar-content a[data-icon][aria-current='page']::before {
+	background-color: var(--sl-color-accent);
+	opacity: 1;
+}

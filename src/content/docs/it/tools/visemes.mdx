@@ -1,0 +1,102 @@
+---
+title: Visemes
+description: Genera le quindici shape key di lip sync vrc.v_* lette da VRChat, a partire da tre forme della bocca che il tuo modello ha già.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+VRChat gestisce il lip sync con quindici shape key chiamate da `vrc.v_aa` a `vrc.v_th`. La maggior parte dei modelli ha solo poche forme della bocca. Il pannello **Visemes** le crea tutte e quindici mescolando tre forme che scegli tu: una "aa" aperta, una "oh" arrotondata e una "ch" a denti stretti.
+
+Il pannello parte chiuso nella scheda CATS.
+
+## Prima di iniziare
+
+- La mesh con le shape key della bocca deve essere imparentata all'armatura. Cats elenca solo le mesh figlie dell'armatura del modello, quindi una mesh sciolta ti dà **No meshes found!**.
+- Unisci prima le mesh, così il viso finisce in un'unica mesh con tutte le sue shape key. [Fix MMD Model](../mmd-options/) lo fa sulle importazioni fresche MMD e VRM, e **Join all meshes** in [Quick Access](../quick-access/) lo fa su qualsiasi modello.
+- Trova tre shape key che muovono davvero la bocca. Sui modelli MMD di solito sono `あ`, `お` e `い` prima della traduzione, oppure `A`, `O` e `I` dopo.
+
+## Crea i visemi
+
+<Steps>
+
+1. Apri **Visemes** nella scheda CATS. Se il modello ha più di una mesh, scegli quella con la bocca in **Mesh**.
+
+2. Imposta le tre forme della bocca:
+
+   | Campo         | Scegli la shape key in cui la bocca…                          |
+   | ------------- | ------------------------------------------------------------- |
+   | **Viseme AA** | è spalancata, come quando dici "aa".                          |
+   | **Viseme OH** | è arrotondata, come quando dici "oh".                         |
+   | **Viseme CH** | ha le labbra aperte e i denti stretti, come quando dici "ch". |
+
+   Cats precompila questi campi con nomi comuni come `MTH A`, `Ah` o `A`. Controllali uno per uno: un nome precompilato è un'ipotesi, e può indicare una chiave che la tua mesh non ha.
+
+3. Lascia **Shape Key Mix Intensity** a `1.0` per un primo tentativo. Abbassalo se la bocca si apre troppo, alzalo se il lip sync sembra debole. Va da 0 a 10.
+
+4. Clicca **Preview Visemes** e scorri i suoni nel menu a tendina per vedere ogni mix sul modello. Clicca **Stop Preview** per riportare le shape key com'erano.
+
+5. Clicca **Create Visemes**. Cats segnala **Created mouth visemes!** quando ha finito.
+
+</Steps>
+
+<Shot
+	name="panel-visemes"
+	alt="Il pannello Visemes con Viseme AA, OH e CH impostati su Fcl_MTH_A, Fcl_MTH_O e Fcl_MTH_I, Shape Key Mix Intensity a 1.00 e il pulsante Create Visemes."
+	caption="Le tre forme della bocca di un modello VRoid scelte nel pannello."
+/>
+
+<Aside type="caution" title="Non scegliere mai Basis">
+	Basis è la forma neutra e non muove la bocca. Cats si rifiuta di procedere con **Please select the
+	correct mouth shapekeys instead of "Basis"!**
+</Aside>
+
+## Come viene mescolato ogni visema
+
+Ogni chiave in uscita è una miscela delle tue tre forme. I pesi qui sotto vengono moltiplicati per **Shape Key Mix Intensity**.
+
+<Shot
+	name="visemes-faces"
+	alt="La stessa faccia tre volte, con la bocca spalancata, arrotondata e con le labbra dischiuse sui denti serrati."
+	caption="vrc.v_aa, vrc.v_oh e vrc.v_ch, generati da una faccia VRoid."
+/>
+
+| Shape key   | AA     | OH     | CH     |
+| ----------- | ------ | ------ | ------ |
+| `vrc.v_aa`  | 1      |        |        |
+| `vrc.v_ch`  |        |        | 1      |
+| `vrc.v_dd`  | 0.3    |        | 0.7    |
+| `vrc.v_e`   | 0.5    |        | 0.2    |
+| `vrc.v_ff`  | 0.2    |        | 0.4    |
+| `vrc.v_ih`  |        | 0.3    | 0.7    |
+| `vrc.v_kk`  | 0.7    |        | 0.4    |
+| `vrc.v_nn`  | 0.2    |        | 0.7    |
+| `vrc.v_oh`  | 0.2    | 0.8    |        |
+| `vrc.v_ou`  |        | 1      |        |
+| `vrc.v_pp`  | minimo | minimo |        |
+| `vrc.v_rr`  |        | 0.3    | 0.5    |
+| `vrc.v_sil` | minimo |        | minimo |
+| `vrc.v_ss`  |        |        | 0.8    |
+| `vrc.v_th`  | 0.4    | 0.15   |        |
+
+`vrc.v_pp` e `vrc.v_sil` sono bocche quasi chiuse. Cats dà loro un peso molto piccolo in modo che non ci siano due chiavi esattamente identiche.
+
+## Cos'altro cambia
+
+Creare i visemi non si limita ad aggiungere quindici chiavi. Aspettati questi effetti collaterali:
+
+- Una chiave esistente con lo stesso nome, come una vecchia `vrc.v_aa`, viene eliminata e ricreata.
+- Le shape key vengono ordinate: prima Basis, poi le chiavi `vrc.blink_*` e `vrc.lowerlid_*` di [Eye Tracking](../eye-tracking/), poi i visemi.
+- L'oggetto armatura viene rinominato `Armature`, e un eventuale Empty genitore dell'armatura viene rimosso.
+- Durante l'esecuzione tutti gli oggetti vengono resi visibili e portati in modalità Object.
+
+## Quando qualcosa non va
+
+- **La bocca si strappa o si deforma troppo.** Abbassa **Shape Key Mix Intensity** e crea di nuovo i visemi. Cats può anche avvisarti che un visema deforma molto la mesh, quando un vertice si sposta del 40% o più della dimensione della mesh.
+- **Una nuova esecuzione sembra non cambiare nulla.** Cats ricorda i mix che ha già creato durante la sessione di Blender corrente. Se crei di nuovo i visemi con le stesse tre chiavi di partenza, alcuni potrebbero essere saltati. Riavvia Blender prima di provare un'intensità diversa.
+- **Il pannello mostra `VisemePanel.error.noShapekeys`.** Quel testo grezzo significa che la mesh selezionata non ha nessuna shape key. Scegli la mesh che contiene il viso.
+
+## Prossimo passo
+
+In Unity, apri l'avatar descriptor, imposta **Lip Sync** su **Viseme Blend Shape** e seleziona la mesh. Dato che le chiavi usano i nomi `vrc.v_*`, il rilevamento automatico dell'SDK compila da solo tutti gli slot dei visemi.

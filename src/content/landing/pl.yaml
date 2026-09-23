@@ -1,0 +1,83 @@
+hero:
+  title: Przygotuj zaimportowane modele do VRChat.
+  lead: Cats bierze model, który importer właśnie wrzucił do Blendera, zmienia nazwy kości, scala wagi, łączy siatki i usuwa pozostałości.
+  download: Pobierz {version}
+  docs: Przewodnik
+  meta: Dla Blendera {series}. Za darmo, na licencji GPL.
+  shotAlt: 'Blender 5.1 z awatarem VRoid w widoku 3D i otwartymi panelami Quick Access oraz MMD Options zakładki CATS na pasku bocznym.'
+  shotCaption: 'Cats w Blenderze 5.1, na przykładowym awatarze CC0 od VRoid po Fix MMD Model.'
+
+releases:
+  toggle: 'Wybierz wersję'
+  title: 'Wszystkie wersje'
+  latest: 'Najnowsza'
+  prerelease: 'Wersja wstępna'
+  all: 'Wszystkie wydania na GitHubie'
+
+fixModel:
+  title: Fix MMD Model robi najcięższą pracę
+  body: Uruchom go raz, zaraz po imporcie modelu MMD lub VRM. Jego listy kości obejmują też szkielety z {rigs}. Pomiń go przy awatarach już przygotowanych do Unity, na przykład z Booth lub Gumroad.
+  points:
+    - Tłumaczy nazwy kości i zmienia je według jednego standardowego szkieletu.
+    - Przenosi wagi kości pomocniczych na kości, które zostają, a potem je usuwa.
+    - Odbudowuje łańcuch Hips, Spine, Chest i Neck.
+    - Łączy siatki i usuwa shape keys, które nic nie robią.
+    - Usuwa rigid bodies, jointy i inne pozostałości MMD.
+  before: 'Po imporcie'
+  after: 'Po Fix MMD Model'
+  figureAlt: 'Ten sam awatar dwa razy. Po lewej kości mają nazwy VRoid, takie jak J_Bip_C_Hips i J_Bip_L_UpperArm; po prawej te same kości nazywają się Hips, Left arm i Left knee.'
+  figureCaption: 'Kręgosłup i lewa strona szkieletu, przed i po. Prawa strona dostaje nazwy w ten sam sposób.'
+
+panels:
+  title: Wszystko w zakładce CATS
+  body: Każdy panel ma własną stronę w przewodniku, w kolejności, w jakiej pokazuje je Blender.
+  items:
+    quickAccess: Import i eksport modeli, łączenie materiałów i siatek oraz testowanie póz.
+    optimization: Atlasy materiałów, łączenie materiałów, łączenie siatek i scalanie kości.
+    customModel: Scalanie dwóch armatur lub dołączanie siatki do kości.
+    mmdOptions: Fix MMD Model i inne narzędzia do świeżych importów MMD i VRM.
+    otherOptions: Tłumaczenie, rozdzielanie siatek, normalne i dodatkowe narzędzia do shape keys.
+    visemes: Tworzy piętnaście shape keys vrc.v_* z trzech kształtów ust.
+    boneParenting: Grupuje podobne kości pod nową kością główną, dla kości z fizyką.
+    modelScaling: Zmienia rozmiar awatara przez dodatek Immersive Scaler.
+    eyeTracking: Ustawia kości oczu pod VRChat SDK3 oraz stary system dla innych gier.
+    settings: Ustawienia eksportu i tłumaczenia, język interfejsu i aktualizacje.
+
+fork:
+  title: Co się zmieniło w tym forku
+  body: Ten fork powstał z myślą o Blenderze 5.x, a we wszystkim innym podąża za upstreamem.
+  timing: Fix Model na awatarze z 323 kośćmi, 14 siatkami i 124k wierzchołków, z identycznym wynikiem.
+  before: przedtem
+  after: teraz
+  items:
+    - title: Sprawdzanie aktualizacji działa.
+      body: Porównanie wersji usuwało serię Blendera tylko z jednej strony, więc żadna aktualizacja nigdy się nie pojawiała.
+    - title: Aktualizacje instalują się przez Blendera.
+      body: Aktualizator przekazuje paczkę do instalatora rozszerzeń Blendera, zamiast usuwać własne pliki.
+    - title: Sloty materiałów zachowują kolejność.
+      body: Połączona siatka ma tę samą kolejność slotów przy każdym uruchomieniu, więc trafia do Unity zawsze tak samo.
+    - title: Certyfikaty TLS są znowu weryfikowane.
+      body: Aktualizator nie wyłącza już sprawdzania certyfikatów dla całej sesji i wszystkich innych dodatków.
+  more: Około trzydziestu innych poprawek jest w historii git.
+
+install:
+  title: Instalacja jako rozszerzenie
+  download:
+    title: Pobranie pliku zip
+    body: Plik {file} jest w najnowszym wydaniu.
+  disk:
+    title: Install from Disk
+    body: Otwórz preferencje rozszerzeń, a potem rozwijane menu w prawym górnym rogu.
+  tab:
+    title: Zakładka CATS
+    body: Naciśnij N w 3D Viewport. Cats znajduje się na pasku bocznym, we własnej zakładce.
+  note: Blender proponuje Cats tylko obsługiwanym wersjom, a dodatek nie uruchomi się w żadnej innej.
+
+credits:
+  title: Skąd pochodzi Cats
+  body: Całość jest na licencji GPL-3.0-or-later. Pliki z nagłówkiem MIT pochodzą z oryginalnego projektu i go zachowują.
+  source: Kod źródłowy
+  lineage:
+    origin: Oryginał autorstwa Hotoxa i GiveMeAllYourCats.
+    upstream: Rozwijany przez Neoneko Team, z osobną linią wydań dla każdej serii Blendera.
+    fork: Linia dla Blendera 5.x, utrzymywana przez Zaphkiel-Ivanovna.

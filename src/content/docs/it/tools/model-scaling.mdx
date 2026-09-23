@@ -1,0 +1,36 @@
+---
+title: Model Scaling
+description: Ridimensiona un avatar e regola le sue proporzioni con l'estensione Immersive Scaler, integrata nel pannello Model Scaling.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**Model Scaling** non ridimensiona il modello da solo. Mostra l'interfaccia di **Immersive Scaler**, un'estensione separata pensata per portare gli avatar a un'altezza precisa e correggerne le proporzioni per la VR.
+
+## Installa Immersive Scaler
+
+Il pannello ti dice cosa ha trovato:
+
+| Messaggio                              | Cosa fare                                                                                                             |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Immersive Scaler is not installed!** | Clicca **Download Immersive Scaler**, installa lo zip dalla sua pagina delle versioni come estensione, poi torna qui. |
+| **Immersive Scaler is not enabled!**   | Clicca **Enable Immersive Scaler**. Cats disattiva le copie più vecchie e attiva quella attuale.                      |
+
+Cats richiede Immersive Scaler 0.5.2 o successivo. Una volta installato e attivato, i suoi controlli compaiono direttamente in questo pannello.
+
+<Shot
+	name="panel-model-scaling"
+	alt="Il pannello Model Scaling con un pulsante Immersive Scaler Help, il messaggio Immersive Scaler is not installed e un pulsante Download Immersive Scaler."
+	caption="Cosa mostra il pannello finché Immersive Scaler non è installato."
+/>
+
+## Usalo
+
+I controlli appartengono a Immersive Scaler, quindi la sua guida è il riferimento: clicca **Immersive Scaler Help** in cima al pannello per aprirla.
+
+<Aside type="tip">
+	Ridimensiona l'avatar prima di creare eye tracking o visemi, e prima di esportare. Cambiare le
+	dimensioni dopo può spostare le ossa degli occhi e le shape key.
+</Aside>

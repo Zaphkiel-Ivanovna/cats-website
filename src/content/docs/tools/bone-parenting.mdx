@@ -1,0 +1,33 @@
+---
+title: Bone Parenting
+description: Group similar sibling bones, such as hair strands or skirt pieces, under one new root bone so physics components can drive them together.
+---
+
+import Shot from '../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Physics components in Unity, such as VRChat PhysBones, are easiest to set up when a whole group of chains hangs from a single bone. **Bone Parenting** creates that bone for you.
+
+<Shot
+	name="panel-bone-parenting"
+	alt="The Bone Parenting panel with a bone group J_Sec_L_SkirtSide1 selected, and Refresh List and Parent Bones buttons."
+/>
+
+<Steps>
+
+1. Open **Bone Parenting** and pick a group in the list. Cats finds sibling bones whose names are at least 70% alike, such as `Hair_1`, `Hair_2` and `Hair_3`, and lists them as `Hair (3 bones)`. Main body bones are never listed.
+
+2. Click **Parent Bones**.
+
+</Steps>
+
+Cats creates a bone named `Root_<first bone>` in the same place as the group's current parent, and moves every bone of the group under it. It reports **Bones parented!** You can now put one physics component on the `Root_` bone.
+
+`Root_` bones are protected: Cats never deletes them as zero-weight bones.
+
+The list is cached. Click **Refresh List** after you rename, add or delete bones.
+
+<Aside type="caution">
+	The group needs a parent bone. If its bones sit at the top of the hierarchy with no parent, the
+	operation fails.
+</Aside>

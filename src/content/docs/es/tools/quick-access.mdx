@@ -1,0 +1,99 @@
+---
+title: Quick Access
+description: El primer panel de la pestaña CATS. Importa modelos de cualquier formato compatible, exporta un FBX para Unity, combina materiales, une mallas y prueba poses.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+**Quick Access** es el panel de la parte superior de la pestaña CATS y el único abierto por defecto. Reúne lo que usas en todos los modelos: importar, exportar, dos optimizaciones rápidas y el modo pose.
+
+<Shot
+	name="panel-quick-access"
+	alt="El panel Quick Access: los botones Import Model y Export Model, el recuadro Quick Actions con Combine Materials y Join all meshes, y el recuadro Pose Mode."
+/>
+
+Cuando hay una actualización disponible, también aparece en la parte superior de este panel un aviso con **Update Now**, **Remind me later** e **Ignore this version**.
+
+## Import Model
+
+**Import Model** abre un explorador de archivos que acepta todos los formatos que conoce Cats. Puedes seleccionar varios archivos a la vez.
+
+| Formato       | Extensiones                           | Se importa con                                                                                         |
+| ------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| MMD           | `.pmx`, `.pmd`                        | El importador de MMD Tools incluido en Cats, a escala 0.08                                             |
+| XNALara       | `.xps`, `.mesh`, `.ascii`             | La extensión XPS Tools, que se instala aparte                                                          |
+| Source Engine | `.smd`, `.qc`, `.qci`, `.vta`, `.dmx` | Blender Source Tools, que se instala aparte                                                            |
+| FBX           | `.fbx`                                | El importador FBX de Blender, con la orientación automática de huesos y la animación desactivadas      |
+| VRM           | `.vrm`                                | La extensión VRM, que se instala aparte                                                                |
+| Archivo       | `.zip`                                | Cats extrae el zip junto a sí mismo e importa el modelo que contiene. Si hay varios, te pregunta cuál. |
+
+El importador también acepta `.dae`, pero pasa por el importador COLLADA propio de Blender: si tu compilación de Blender no lo incluye, los archivos DAE no se importarán.
+
+Cuando un formato necesita una extensión que no tienes, Cats muestra un cuadro de diálogo como **XPS Tools is not installed or enabled!** con un botón que abre su página de descarga.
+
+Antes de importar, Cats borra el cubo, la cámara y la luz por defecto de Blender, pero solo si los tres siguen en la escena. Después de importar, la nueva armadura pasa a ser la que usa Cats.
+
+El pequeño botón de menú junto a **Import Model** abre una ventana emergente con un botón por formato, además de dos formas de importar una animación de MMD (`.vmd`) en la armadura actual.
+
+<Aside type="caution">
+	Los archivos FBX guardados con una versión muy antigua del formato se rechazan con **The FBX file
+	version is unsupported!** Conviértelos antes con una herramienta como Autodesk FBX Converter.
+</Aside>
+
+## Export Model
+
+**Export Model** aparece en cuanto la escena tiene una armadura. Abre una ventana emergente con dos opciones:
+
+- **Export Model** escribe un FBX para Unity con los ajustes que necesita VRChat.
+- **Export for Resonite** abre el exportador glTF de Blender, configurado para Resonite.
+
+### Comprobaciones antes de exportar
+
+Antes de escribir el FBX, Cats revisa las mallas visibles del modelo. Si algo parece incorrecto, un cuadro **Warning:** lo explica, y puedes arreglarlo o hacer clic en **Continue to Export**.
+
+| Aviso                      | Cuándo                                                                                                                            |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Too many polygons!**     | Más de 70 000 caras. Reduce la geometría antes de exportar.                                                                       |
+| **Model not optimized!**   | Más de 4 materiales. Consulta [Optimization](../optimization/) para combinarlos o crear un atlas.                                 |
+| **Meshes not joined!**     | Más de 2 mallas. El cuadro de diálogo tiene un botón **Join Meshes**.                                                             |
+| **Broken shapekeys!**      | Una shape key tiene vértices desplazados absurdamente lejos. VRChat rechazará la subida hasta que la borres o la repares.         |
+| **No textures found!**     | **Embed Textures on Export** está activado pero el modelo no tiene materiales. Tendrás que importar las texturas a mano en Unity. |
+| **Eyes not named 'Body'!** | Una malla tiene shape keys de seguimiento ocular pero no se llama `Body`. Renómbrala si usas el seguimiento ocular heredado.      |
+
+### Ajustes FBX que usa Cats
+
+No tienes que configurar nada en el exportador FBX de Blender. Cats usa:
+
+- Tipos de objeto: Empty, Armature, Mesh y Other.
+- **Apply Scalings** en **FBX All**.
+- **Add Leaf Bones** desactivado, **Bake Animation** desactivado, **Apply Modifiers** desactivado.
+- Texturas incrustadas cuando **Embed Textures on Export** está activado en [Settings & Updates](../settings/).
+
+Exporta toda la escena, no solo la selección, así que oculta o borra lo que no quieras en Unity.
+
+## Quick Actions
+
+Dos atajos a herramientas que también están en [Optimization](../optimization/):
+
+- **Combine Materials** fusiona los materiales idénticos, lo que reduce las draw calls sin cambiar el aspecto del avatar.
+- **Join all meshes** une en una sola todas las mallas emparentadas con la armadura, aplica las transformaciones, renombra el primer mapa UV a `UVMap`, repara el modificador Armature y llama `Body` al resultado.
+
+El recuadro también incluye una nota: **Fix Model Button has been removed.** Ahora está en [MMD Options](../mmd-options/) como **Fix MMD Model**.
+
+## Modo pose
+
+Prueba cómo se mueve el modelo sin salir de la pestaña CATS.
+
+- **Start Pose Mode** pasa la armadura al modo Pose, restablece todos los huesos y shape keys y selecciona la herramienta de rotación. El pequeño botón de al lado hace lo mismo sin restablecer la pose actual.
+- **Stop Pose Mode** vuelve al modo Object y restablece la pose. Su pequeño gemelo conserva la pose.
+
+En el modo Pose aparecen dos botones más:
+
+- **Pose to Shape Key** te pide un nombre y guarda la pose actual como una nueva shape key en cada malla. Útil para crear expresiones o formas correctivas.
+- **Apply as Rest Pose** aplica la pose actual a las mallas, incluidas sus shape keys, y la convierte en la nueva pose de reposo de la armadura. Úsalo para arreglar un modelo importado en una pose en A que no quieres.
+
+## Armadura
+
+Si la escena contiene más de una armadura, aparece un desplegable **Armature**. Todas las herramientas de Cats trabajan sobre la armadura seleccionada ahí, no sobre el objeto activo.

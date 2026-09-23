@@ -1,0 +1,253 @@
+.site-title {
+	color: var(--sl-color-white);
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+
+.sidebar-content a:hover,
+.sidebar-content a:focus-visible {
+	background-color: color-mix(in srgb, var(--sl-color-gray-5) 45%, transparent);
+}
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover,
+.sidebar-content a[aria-current='page']:focus {
+	color: var(--sl-color-white);
+	background-color: color-mix(in srgb, var(--sl-color-gray-5) 70%, transparent);
+	box-shadow: inset 2px 0 0 var(--sl-color-accent);
+	border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.sl-markdown-content .sl-heading-wrapper.level-h2 {
+	margin-top: 3rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid var(--sl-color-gray-5);
+}
+.sl-markdown-content h2:not(:where(.not-content *)) {
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+.sl-markdown-content h3:not(:where(.not-content *)) {
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+.sl-markdown-content a:not(:where(.not-content *)) {
+	text-underline-offset: 0.2em;
+	text-decoration-thickness: 1px;
+}
+
+.sl-markdown-content code:not(:where(.not-content *)) {
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 4px;
+}
+.sl-markdown-content pre code:not(:where(.not-content *)) {
+	border: 0;
+}
+.sl-markdown-content kbd:not(:where(.not-content *)) {
+	padding: 0.05rem 0.4rem;
+	border: 1px solid var(--sl-color-gray-5);
+	border-bottom-width: 2px;
+	border-radius: 5px;
+	background: var(--sl-color-gray-6);
+	font-family: var(--sl-font-mono);
+	font-size: 0.8em;
+}
+
+.sl-markdown-content table:not(:where(.not-content *)) {
+	font-size: var(--sl-text-sm);
+}
+.sl-markdown-content th:not(:where(.not-content *)) {
+	padding-block: 0 0.6rem;
+	font-size: var(--sl-text-xs);
+	font-weight: 500;
+	color: var(--sl-color-gray-3);
+}
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+	padding-inline-end: 1.25rem;
+}
+.sl-markdown-content td:not(:where(.not-content *)) {
+	padding-block: 0.6rem;
+}
+.sl-markdown-content td code:not(:where(.not-content *)) {
+	white-space: nowrap;
+}
+
+.starlight-aside {
+	border-inline-start-width: 2px;
+	border-radius: 0 8px 8px 0;
+	background-color: var(--sl-color-gray-6);
+}
+:root[data-theme='light'] .starlight-aside {
+	background-color: var(--sl-color-gray-7);
+}
+.starlight-aside__title {
+	font-size: var(--sl-text-base);
+}
+.sl-markdown-content .starlight-aside code:not(:where(.not-content *)) {
+	background-color: var(--sl-color-black);
+}
+
+.sl-steps > li::before {
+	border: 1px solid var(--sl-color-accent);
+	background-color: var(--sl-color-black);
+	color: var(--sl-color-accent);
+	font-family: var(--sl-font-mono);
+	font-weight: 500;
+}
+.sl-steps > li::after {
+	background: linear-gradient(var(--sl-color-gray-4), var(--sl-color-gray-5));
+}
+
+starlight-tabs [role='tab'][aria-selected='true'] {
+	border-color: var(--sl-color-accent);
+	color: var(--sl-color-white);
+}
+
+.pagination-links a {
+	border-color: var(--sl-color-gray-5);
+	box-shadow: none;
+}
+.pagination-links a:hover {
+	border-color: var(--sl-color-accent);
+}
+
+.sl-markdown-content details:not(:where(.not-content *)) {
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 8px;
+	padding: 0;
+	background-color: var(--sl-color-gray-6);
+	transition: border-color 0.2s ease-out;
+}
+:root[data-theme='light'] .sl-markdown-content details:not(:where(.not-content *)) {
+	background-color: var(--sl-color-gray-7);
+}
+.sl-markdown-content details + details:not(:where(.not-content *)) {
+	margin-top: 0.5rem;
+}
+.sl-markdown-content details:not([open]):hover:not(:where(.not-content *)),
+.sl-markdown-content details:has(> summary:hover):not(:where(.not-content *)) {
+	border-color: color-mix(in srgb, var(--sl-color-accent) 55%, var(--sl-color-gray-5));
+}
+.sl-markdown-content details[open]:not(:where(.not-content *)) {
+	border-color: var(--sl-color-gray-4);
+}
+.sl-markdown-content summary:not(:where(.not-content *)) {
+	display: flex;
+	align-items: center;
+	gap: 0.65rem;
+	margin: 0;
+	padding: 0.8rem 1rem;
+	font-family: var(--sl-font-mono);
+	font-size: var(--sl-text-sm);
+	font-weight: 500;
+}
+.sl-markdown-content details[open] > summary:not(:where(.not-content *)) {
+	margin-bottom: 0;
+	border-bottom: 1px solid var(--sl-color-gray-5);
+}
+.sl-markdown-content summary:not(:where(.not-content *))::before {
+	flex: none;
+	margin: 0;
+	color: var(--sl-color-accent);
+	transition: transform 0.25s var(--cats-ease);
+}
+.sl-markdown-content details:not(:where(.not-content *)) > :not(summary) {
+	margin-inline: 1rem;
+}
+.sl-markdown-content details:not(:where(.not-content *)) > summary + * {
+	margin-top: 0.9rem;
+}
+.sl-markdown-content details:not(:where(.not-content *)) > :last-child {
+	margin-bottom: 1rem;
+}
+
+:root {
+	interpolate-size: allow-keywords;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	:is(.sidebar-content, .sl-markdown-content) details::details-content {
+		block-size: 0;
+		overflow-y: clip;
+		transition:
+			block-size 0.3s var(--cats-ease),
+			content-visibility 0.3s allow-discrete;
+	}
+	:is(.sidebar-content, .sl-markdown-content) details[open]::details-content {
+		block-size: auto;
+	}
+	.sidebar-content details[open] > ul {
+		transition:
+			opacity 0.3s ease-out,
+			translate 0.3s var(--cats-ease);
+		@starting-style {
+			opacity: 0;
+			translate: 0 -4px;
+		}
+	}
+
+	starlight-tabs [role='tab'] {
+		transition:
+			color 0.15s ease-out,
+			border-color 0.2s ease-out;
+	}
+	starlight-tabs [role='tabpanel']:not([hidden]) {
+		animation: cats-rise 0.25s var(--cats-ease);
+	}
+
+	#starlight__mobile-toc[open] .dropdown {
+		animation: cats-drop 0.2s var(--cats-ease);
+	}
+
+	site-search dialog[open] {
+		animation: cats-dialog 0.22s var(--cats-ease);
+	}
+	site-search dialog[open]::backdrop {
+		animation: cats-fade 0.22s ease-out;
+	}
+
+	.pagination-links a {
+		transition:
+			border-color 0.2s ease-out,
+			translate 0.2s var(--cats-ease);
+	}
+	.pagination-links a:hover {
+		translate: 0 -2px;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) and (max-width: 50rem) {
+	.sidebar-pane:popover-open {
+		animation: cats-slide 0.28s var(--cats-ease);
+	}
+}
+
+@keyframes cats-rise {
+	from {
+		opacity: 0;
+		translate: 0 6px;
+	}
+}
+@keyframes cats-drop {
+	from {
+		opacity: 0;
+		translate: 0 -6px;
+	}
+}
+@keyframes cats-slide {
+	from {
+		opacity: 0;
+		translate: -16px 0;
+	}
+}
+@keyframes cats-dialog {
+	from {
+		opacity: 0;
+		scale: 0.98;
+		translate: 0 8px;
+	}
+}
+@keyframes cats-fade {
+	from {
+		opacity: 0;
+	}
+}

@@ -1,0 +1,126 @@
+---
+title: Eye Tracking
+description: Prepara los huesos de los ojos para el seguimiento ocular del SDK3 de VRChat, o crea la configuración heredada de huesos y shape keys que otros juegos siguen usando.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+El panel **Eye Tracking** tiene dos partes, y la que necesitas depende de adónde vaya el avatar:
+
+| Parte                   | Para qué sirve                                                      | Qué hace                                                                                     |
+| ----------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **SDK3 Eye Tracking**   | Avatares de VRChat (Avatars 3.0)                                    | Gira los huesos de los ojos para que configurar la mirada en Unity sea sencillo.             |
+| **Legacy Eye Tracking** | ChilloutVR y otros juegos que todavía leen la configuración antigua | Crea nuevos huesos `LeftEye` y `RightEye` y las shape keys `vrc.blink_*` y `vrc.lowerlid_*`. |
+
+<Aside type="danger" title="No uses Legacy Eye Tracking para VRChat">
+	VRChat configura el seguimiento ocular en Unity, mediante el descriptor del avatar. La
+	configuración heredada se hizo para el SDK antiguo y no debe usarse en avatares del SDK3 de
+	VRChat.
+</Aside>
+
+## SDK3 Eye Tracking
+
+Para VRChat, lo único que tiene que hacer Cats es orientar los huesos de los ojos hacia arriba y sin giro (roll). Así, los ajustes de mirada de Unity se comportan igual en todos los modelos.
+
+<Shot
+	name="panel-eye-sdk3"
+	alt="La sección SDK3 Eye Tracking con Left Eye en Eye_L, Right Eye en Eye_R y el botón Rotate eye bones."
+/>
+
+<Steps>
+
+1. En **Left Eye** y **Right Eye**, elige los huesos de los ojos del modelo. Después de [Fix MMD Model](../mmd-options/) se llaman `Eye_L` y `Eye_R`.
+
+2. Haz clic en **Rotate eye bones**.
+
+</Steps>
+
+Cats muestra **Eye bones rotated.**, o **Eye bones are already rotated for VRChat, no changes were made.** si no había nada que hacer. Mantiene la cabeza de cada hueso donde estaba, desconecta los huesos hijos que estaban unidos a los ojos y vuelve a activar X-Axis Mirror después si lo tenías activado.
+
+El botón está desactivado hasta que se asignan los dos huesos de los ojos. Si otro objeto está en modo Edit, sal de él primero o abre la armadura en modo Edit.
+
+## Legacy Eye Tracking
+
+La configuración heredada añade movimiento de ojos y parpadeo mediante huesos y shape keys. Tiene dos modos: primero la creas y luego Cats cambia el panel al modo de prueba.
+
+<Shot
+	name="panel-eye-legacy"
+	alt="La sección Legacy Eye Tracking en modo de creación: los huesos Head, Left Eye y Right Eye, cuatro shape keys de parpadeo y de párpado inferior, las dos opciones Disable, Eye Movement Range y Create Eye Tracking."
+/>
+
+### Requisitos
+
+Cats comprueba lo siguiente antes de empezar y se detiene en el primer punto que falle:
+
+- La malla con los ojos está emparentada con la armadura y tiene shape keys.
+- La malla tiene grupos de vértices para ambos ojos, con nombres que contienen `LeftEye`, `Eye_L`, `eye.L`, `EyeLeft`, `left_eye` o `l_eye`, y sus equivalentes del lado derecho.
+- Los huesos **Head**, **Left Eye** y **Right Eye** existen en la armadura.
+- La cadena de huesos es exactamente **Hips > Spine > Chest > Neck > Head**.
+- Para que el juego la encuentre, la armadura debe llamarse `Armature` y la malla con los ojos `Body`. Cats renombra la armadura a `Armature` al crear el seguimiento ocular, y **Join all meshes** en [Quick Access](../quick-access/) llama `Body` a la malla unida.
+
+Reduce la geometría **antes** de este paso. Cats crea los nuevos huesos de los ojos a partir de los grupos de vértices actuales, así que los cambios posteriores en la malla pueden estropearlos.
+
+### Crearlo
+
+<Steps>
+
+1. Elige la **Mesh** con los ojos, si hay más de una.
+
+2. Asigna a **Head**, **Left Eye** y **Right Eye** los huesos existentes.
+
+3. Asigna las cuatro shape keys:
+
+   | Campo              | Shape key                                                                                                          |
+   | ------------------ | ------------------------------------------------------------------------------------------------------------------ |
+   | **Blink Left**     | El ojo izquierdo cerrado.                                                                                          |
+   | **Blink Right**    | El ojo derecho cerrado.                                                                                            |
+   | **Lowerlid Left**  | El párpado inferior izquierdo ligeramente subido. Ponlo en `Basis` para omitir el movimiento del párpado inferior. |
+   | **Lowerlid Right** | Lo mismo para el lado derecho.                                                                                     |
+
+4. Ajusta las opciones si hace falta:
+   - **Disable Eye Blinking** conserva solo el movimiento de los ojos. Cats crea igualmente las shape keys de parpadeo, pero vacías.
+   - **Disable Eye Movement** conserva solo el parpadeo. No puedes marcar ambas.
+   - **Eye Movement Range** (por defecto `0.8`) define cuánto pueden girar los ojos. Un valor demasiado bajo o demasiado alto provoca fallos visuales.
+
+5. Haz clic en **Create Eye Tracking**.
+
+</Steps>
+
+Cats crea dos huesos nuevos, `LeftEye` y `RightEye`, emparentados con Head y orientados hacia arriba. Cada hueso nuevo se coloca entre el hueso del ojo antiguo y el centro de la malla del ojo, según **Eye Movement Range**. Después copia los grupos de vértices de los ojos a los nuevos huesos y crea `vrc.blink_left`, `vrc.blink_right`, `vrc.lowerlid_left` y `vrc.lowerlid_right` a partir de tus shape keys, sustituyendo las anteriores con el mismo nombre.
+
+Si todo va bien, muestra **Created eye tracking!** y el panel pasa al modo de prueba. Si la cadena de huesos es incorrecta, Cats indica qué hueso no está bien emparentado y se queda en el modo de creación.
+
+### Probarlo
+
+<Tabs>
+<TabItem label="Movimiento de ojos">
+
+1. Haz clic en **Start Eye Testing**. Cats entra en modo Pose, restablece todas las poses y oculta todos los huesos excepto los dos ojos.
+2. Mueve **Up - Down** y **Left - Right** para mirar alrededor. Los valores están en grados.
+3. Si los ojos giran demasiado o demasiado poco, cambia **Eye Movement Range** y haz clic en **Set Range**. Cats vuelve a mover los huesos de los ojos y guarda el nuevo rango.
+4. Haz clic en **Reset Rotation** para volver a mirar al frente.
+
+</TabItem>
+<TabItem label="Parpadeo">
+
+1. Ajusta **Blink Strength** y haz clic en el **Test** de al lado para previsualizar las dos shape keys de parpadeo a la vez.
+2. Haz lo mismo con **Lowerlid Strength** para los párpados inferiores.
+3. Haz clic en **Reset Shapes** para devolver todas las shape keys a 0.
+
+</TabItem>
+</Tabs>
+
+Haz clic en **Stop Eye Testing** cuando termines: vuelve a mostrar los huesos, borra la pose de prueba y regresa al modo Object. **Reset Eye Tracking Panel** devuelve el panel al modo de creación. En el juego o motor, recuerda asignar `LeftEye` y `RightEye` como huesos de los ojos.
+
+### Solución de problemas
+
+El panel incluye una breve lista de comprobación que cubre la mayoría de los fallos:
+
+- La malla tiene grupos de vértices para los ojos, con los nombres indicados arriba.
+- Las shape keys tienen el nombre correcto y están seleccionadas en los campos.
+- Los huesos de los ojos tienen realmente pesos sobre los ojos. En modo Pose, al girarlos deberían moverse los ojos.
+- La armadura está en posición de reposo.
+
+Si **Set Range** indica que un hueso no tiene grupo de vértices o no tiene vértices asignados, has elegido la malla o el hueso equivocados, o las mallas no se unieron antes de crear el seguimiento ocular.

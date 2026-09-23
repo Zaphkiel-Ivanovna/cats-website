@@ -1,0 +1,44 @@
+---
+title: Settings & Updates
+description: Ajustes de exportación y traducción, el idioma de la interfaz de Cats y el actualizador integrado.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+**Settings & Updates** está cerca de la parte inferior de la pestaña CATS, plegado por defecto.
+
+<Shot
+	name="panel-settings"
+	alt="El panel Settings & Updates: casillas de ajustes, la carpeta CSV, Cats Language, Clear Local Google Translations y el actualizador con Check now for Update e Install version."
+/>
+
+## Ajustes
+
+| Ajuste                                   | Por defecto      | Qué hace                                                                                                                                                                                                                                                     |
+| ---------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Embed Textures on Export**             | Desactivado      | Incluye las texturas dentro del FBX que escribe [Export Model](../quick-access/#export-model). Unity las extrae a una carpeta al importar. El archivo ocupa más, y esto no funciona para todo el mundo. Este ajuste se guarda para todos tus archivos blend. |
+| **Remove Rigidbodies and Joints Global** | Activado         | Borra todas las colecciones con un nombre del tipo "rigidbody", junto con sus objetos, cada vez que usas la mayoría de los botones de Cats. Desactívalo solo si necesitas conservar las físicas de MMD.                                                      |
+| **Export Translations To CSV**           | Desactivado      | Escribe cada traducción en un archivo CSV con los nombres originales y traducidos. Antes hay que guardar el archivo blend.                                                                                                                                   |
+| **Custom CSV Export Location**           | `Documents/Cats` | Dónde se guardan esos archivos CSV.                                                                                                                                                                                                                          |
+| **Cats Language**                        | auto             | El idioma de la interfaz de Cats: inglés, japonés, coreano o chino simplificado. Con **auto**, Cats elige el idioma por sí mismo.                                                                                                                            |
+
+## Depuración
+
+**Clear Local Google Translations** borra los resultados de Google Translate que Cats ha guardado en caché en tu ordenador. La próxima vez los nombres se traducirán desde cero. No se puede deshacer.
+
+## Actualizaciones
+
+El actualizador consulta las versiones del proyecto:
+
+- **Check now for Update** busca una nueva versión. Después, el botón muestra **Update now to** seguido de la nueva versión, o **Up to Date!**
+- **Install version** te permite elegir e instalar una versión concreta, con sus notas de cambios.
+- **Current version** muestra la versión que estás usando.
+
+Cats instala las actualizaciones con el propio instalador de extensiones de Blender. Cuando termina, muestra **Restart Blender to complete update!**
+
+<Aside type="note">
+	La búsqueda de actualizaciones necesita acceso a la red, tal como se declara en los permisos de la
+	extensión. Consulta [Instalación](../../guides/install/#qué-permisos-pide-cats).
+</Aside>

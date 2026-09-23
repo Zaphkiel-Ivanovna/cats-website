@@ -1,0 +1,52 @@
+---
+import { Icon } from 'astro-icon/components';
+import { pageIcons } from '../icons';
+
+const { entry, id, locale } = Astro.locals.starlightRoute;
+const slug = locale ? id.replace(`${locale}/`, '') : id;
+const icon = pageIcons[slug];
+---
+
+<div class="page-title">
+	{icon && (
+		<span class="tile" aria-hidden="true">
+			<Icon name={`ph:${icon}`} />
+		</span>
+	)}
+	<h1 id="_top">{entry.data.title}</h1>
+</div>
+
+<style>
+	.page-title {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-top: 1rem;
+	}
+	h1 {
+		font-size: var(--sl-text-h1);
+		line-height: var(--sl-line-height-headings);
+		font-weight: 600;
+		letter-spacing: -0.025em;
+		color: var(--sl-color-white);
+	}
+	.tile {
+		display: grid;
+		place-items: center;
+		flex: none;
+		width: 3rem;
+		height: 3rem;
+		border-radius: 10px;
+		border: 1px solid color-mix(in srgb, var(--sl-color-accent) 35%, var(--sl-color-gray-5));
+		background: color-mix(in srgb, var(--sl-color-accent-low) 60%, transparent);
+		color: var(--sl-color-accent);
+		font-size: 1.6rem;
+	}
+	@media (max-width: 50rem) {
+		.tile {
+			width: 2.5rem;
+			height: 2.5rem;
+			font-size: 1.35rem;
+		}
+	}
+</style>

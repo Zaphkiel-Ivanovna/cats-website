@@ -1,0 +1,99 @@
+---
+title: Troubleshooting
+description: What the most common Cats error messages mean and how to get past them.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Cats shows errors in a popup titled **Report: Error**, or in Blender's status bar. Here are the ones people run into most, with the fix.
+
+## Model and mesh errors
+
+<details>
+<summary>No meshes found!</summary>
+
+Cats only counts meshes that are **parented to the armature**. A mesh that sits next to the armature in the Outliner, but not under it, is ignored. Select the mesh, then the armature, press <kbd>Ctrl</kbd> + <kbd>P</kbd> and pick **With Empty Groups** or **Object**, depending on whether it already has weights.
+
+Fix MMD Model says the same thing in its own words: **No mesh inside the armature found!**
+
+</details>
+
+<details>
+<summary>Your Objects/ Meshes are not Single User</summary>
+
+Two objects share the same mesh or armature data, usually after duplicating with <kbd>Alt</kbd> + <kbd>D</kbd>. Select all objects, then run **Object > Relations > Make Single User > Object & Data**, and try again.
+
+</details>
+
+<details>
+<summary>Rigify and Metarig armatures are not supported</summary>
+
+Fix MMD Model refuses rigs made with Rigify, detected by the name `metarig` or bones starting with `DEF-`, `MCH-` or `ORG-`. Use a Rigify-to-Unity add-on to convert the rig instead. If your rig is not a Rigify rig, rename the bones and the armature so they do not use those names.
+
+</details>
+
+<details>
+<summary>The following bones were not found</summary>
+
+Shown at the end of Fix MMD Model when some main bones, such as a leg or the neck, could not be identified. The fix still completes. Rename the missing bones by hand to the standard names (`Left leg`, `Neck` and so on) and check the hierarchy. If the model is unmodified, the upstream project welcomes reports so they can support it.
+
+</details>
+
+## Import errors
+
+<details>
+<summary>XPS Tools / Source Tools / VRM Importer is not installed or enabled!</summary>
+
+Cats relies on separate add-ons for these formats. Click the download button in the dialog, install the add-on in **Edit > Preferences > Add-ons**, enable it, and import again.
+
+</details>
+
+<details>
+<summary>The FBX file version is unsupported!</summary>
+
+The FBX is too old for Blender's importer. Convert it to a newer FBX version with a tool such as Autodesk FBX Converter.
+
+</details>
+
+## Translation errors
+
+<details>
+<summary>Could not connect to Google / banned from Google Translate temporarily</summary>
+
+Cats translated what it could with its built-in dictionary, but Google refused the rest, often after many requests in a row. Wait a while and click **Translate** again: only the missing names are sent. Check that Blender is allowed to go online.
+
+</details>
+
+## Export warnings
+
+The warnings Cats shows before exporting are advice, not errors: you can click **Continue to Export**. They match what VRChat uses to rank avatar performance. See the table in [Export Model](../../tools/quick-access/#checks-before-export).
+
+**Broken shapekeys!** is the exception: VRChat refuses to upload an avatar with those shape keys. Delete them, or try **Repair Broken Shapekeys** in [Other Options](../../tools/other-options/).
+
+## Eye tracking and visemes
+
+<details>
+<summary>Eye tracking will not work unless the bone hierarchy is exactly as following</summary>
+
+Legacy eye tracking: the chain must be Hips > Spine > Chest > Neck > Head, the armature named `Armature` and the eye mesh `Body`.
+
+</details>
+
+<details>
+<summary>Please select the correct mouth shapekeys instead of "Basis"!</summary>
+
+Visemes: pick shape keys that actually open the mouth.
+
+</details>
+
+## Messages that look like code
+
+Some messages show up as raw keys, such as `VisemePanel.error.noShapekeys` or `RemoveDoubles.error.failed`. That means the English text is missing from the add-on's translation file. The key usually says what happened: here, the mesh has no shape keys, or removing doubles failed.
+
+<Aside type="tip">
+	Still stuck? Open an issue on
+	[GitHub](https://github.com/Zaphkiel-Ivanovna/cats-blender-plugin-unofficial/issues) with your
+	Blender version, the message, and what you clicked. For problems that are not specific to Blender
+	5.x, the [upstream project](https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-/issues)
+	is the better place.
+</Aside>

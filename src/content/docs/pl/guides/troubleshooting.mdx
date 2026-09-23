@@ -1,0 +1,100 @@
+---
+title: Rozwiązywanie problemów
+description: Co oznaczają najczęstsze komunikaty o błędach Cats i jak sobie z nimi poradzić.
+sourceUpdated: 2026-09-23
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Cats wyświetla błędy w okienku zatytułowanym **Report: Error** lub na pasku stanu Blendera. Poniżej znajdziesz te, na które użytkownicy trafiają najczęściej, wraz z rozwiązaniem.
+
+## Błędy modelu i siatki
+
+<details>
+<summary>No meshes found!</summary>
+
+Cats uwzględnia tylko siatki **podpięte do szkieletu**. Siatka, która w Outlinerze leży obok szkieletu, ale nie pod nim, jest pomijana. Zaznacz siatkę, potem szkielet, naciśnij <kbd>Ctrl</kbd> + <kbd>P</kbd> i wybierz **With Empty Groups** lub **Object**, zależnie od tego, czy siatka ma już wagi.
+
+Fix MMD Model zgłasza to samo własnymi słowami: **No mesh inside the armature found!**
+
+</details>
+
+<details>
+<summary>Your Objects/ Meshes are not Single User</summary>
+
+Dwa obiekty współdzielą te same dane siatki lub szkieletu, zwykle po duplikowaniu przez <kbd>Alt</kbd> + <kbd>D</kbd>. Zaznacz wszystkie obiekty, uruchom **Object > Relations > Make Single User > Object & Data** i spróbuj ponownie.
+
+</details>
+
+<details>
+<summary>Rigify and Metarig armatures are not supported</summary>
+
+Fix MMD Model odrzuca riggi utworzone w Rigify, rozpoznawane po nazwie `metarig` lub kościach zaczynających się od `DEF-`, `MCH-` albo `ORG-`. Zamiast tego przekonwertuj rig dodatkiem typu Rigify-to-Unity. Jeśli Twój rig nie pochodzi z Rigify, zmień nazwy kości i szkieletu tak, aby nie używały tych nazw.
+
+</details>
+
+<details>
+<summary>The following bones were not found</summary>
+
+Pojawia się na końcu Fix MMD Model, gdy nie udało się rozpoznać niektórych głównych kości, na przykład nogi lub szyi. Naprawa i tak się kończy. Ręcznie nadaj brakującym kościom standardowe nazwy (`Left leg`, `Neck` i tak dalej) i sprawdź hierarchię. Jeśli model nie był modyfikowany, projekt upstream chętnie przyjmie zgłoszenie, aby dodać jego obsługę.
+
+</details>
+
+## Błędy importu
+
+<details>
+<summary>XPS Tools / Source Tools / VRM Importer is not installed or enabled!</summary>
+
+Do obsługi tych formatów Cats potrzebuje osobnych dodatków. Kliknij przycisk pobierania w oknie, zainstaluj dodatek w **Edit > Preferences > Add-ons**, włącz go i zaimportuj ponownie.
+
+</details>
+
+<details>
+<summary>The FBX file version is unsupported!</summary>
+
+Plik FBX jest za stary dla importera Blendera. Przekonwertuj go do nowszej wersji FBX narzędziem takim jak Autodesk FBX Converter.
+
+</details>
+
+## Błędy tłumaczenia
+
+<details>
+<summary>Could not connect to Google / banned from Google Translate temporarily</summary>
+
+Cats przetłumaczył, co mógł, za pomocą wbudowanego słownika, ale Google odrzucił resztę, często po wielu zapytaniach z rzędu. Odczekaj chwilę i ponownie kliknij **Translate**: wysyłane są tylko brakujące nazwy. Sprawdź, czy Blender ma dostęp do internetu.
+
+</details>
+
+## Ostrzeżenia przy eksporcie
+
+Ostrzeżenia wyświetlane przez Cats przed eksportem to porady, a nie błędy: możesz kliknąć **Continue to Export**. Odpowiadają kryteriom, według których VRChat ocenia wydajność awatara. Zobacz tabelę w [Export Model](../../tools/quick-access/#kontrole-przed-eksportem).
+
+Wyjątkiem jest **Broken shapekeys!**: VRChat odmawia przesłania awatara z takimi shape keys. Usuń je lub spróbuj **Repair Broken Shapekeys** w [Other Options](../../tools/other-options/).
+
+## Śledzenie oczu i wizemy
+
+<details>
+<summary>Eye tracking will not work unless the bone hierarchy is exactly as following</summary>
+
+Starsze śledzenie oczu: łańcuch musi mieć postać Hips > Spine > Chest > Neck > Head, szkielet musi nazywać się `Armature`, a siatka oczu `Body`.
+
+</details>
+
+<details>
+<summary>Please select the correct mouth shapekeys instead of "Basis"!</summary>
+
+Wizemy: wybierz shape keys, które faktycznie otwierają usta.
+
+</details>
+
+## Komunikaty wyglądające jak kod
+
+Niektóre komunikaty pojawiają się jako surowe klucze, na przykład `VisemePanel.error.noShapekeys` lub `RemoveDoubles.error.failed`. Oznacza to, że w pliku tłumaczeń rozszerzenia brakuje tekstu angielskiego. Klucz zwykle mówi, co się stało: tutaj siatka nie ma shape keys albo usuwanie zdublowanych wierzchołków się nie powiodło.
+
+<Aside type="tip">
+	Nadal nie działa? Zgłoś problem na
+	[GitHubie](https://github.com/Zaphkiel-Ivanovna/cats-blender-plugin-unofficial/issues), podając
+	wersję Blendera, komunikat i to, co kliknięto. W przypadku problemów, które nie dotyczą wyłącznie
+	Blendera 5.x, lepszym miejscem jest [projekt
+	upstream](https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-/issues).
+</Aside>

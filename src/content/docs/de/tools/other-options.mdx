@@ -1,0 +1,70 @@
+---
+title: Other Options
+description: Japanische Namen ins Englische übersetzen, Meshes aufteilen, Normalen korrigieren sowie zusätzliche Werkzeuge für Shape Keys, Twist-Knochen und Beine.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+**Other Options** versammelt Werkzeuge, die nirgendwo sonst hineinpassen. Das Panel ist anfangs eingeklappt, und ein Schalter **Show More Options** blendet eine zweite Gruppe von Werkzeugen ein.
+
+<Shot
+	name="panel-other-options"
+	alt="Das Panel Other Options mit aktiviertem Show More Options: Separate by, Translate, Normals sowie Werkzeuge für Shape Keys und Knochen."
+	caption="Other Options mit aktiviertem Show More Options."
+/>
+
+## Separate by
+
+Teilt das aktive Mesh oder das einzige Mesh des Modells auf:
+
+- **Materials** erzeugt ein Mesh pro Material.
+- **Loose Parts** erzeugt ein Mesh pro zusammenhanglosem Teil, für feinere Kontrolle.
+- **Shapes** teilt das Mesh in zwei: den von Shape Keys bewegten Teil und den Rest. Praktisch vor dem manuellen Dezimieren, da sich dann der statische Teil dezimieren lässt, ohne das Gesicht anzutasten.
+
+<Aside type="caution">
+	Niemals einen Teil dezimieren, für den später Shape Keys nötig sein könnten: Gesicht, Mund, Augen.
+</Aside>
+
+## Translate
+
+MMD-Modelle haben meist japanische Namen. Diese Buttons übersetzen sie ins Englische:
+
+- **All** übersetzt Knochen, Shape Keys, Objekte und Materialien, in dieser Reihenfolge.
+- **Shape Keys**, **Objects**, **Bones** und **Materials** übersetzen jeweils eine Art von Namen.
+
+Cats schlägt Namen zuerst im eingebauten Wörterbuch nach und schickt den Rest an Google Translate. Die Ergebnisse von Google werden auf dem Computer zwischengespeichert, sodass jeder Name nur einmal gesendet wird. Knochen und Shape Keys werden auf **allen** Armaturen und Meshes der Datei übersetzt, nicht nur im ausgewählten Modell. Shape Keys, die mit `vrc.` beginnen, bleiben immer unverändert.
+
+Zwei Optionen ändern die Übersetzung von Shape Keys:
+
+- **Use Old Translations (not recommended)** überspringt das Wörterbuch und nutzt nur Google, wie Cats 0.9.0 und älter. Nur verwenden, wenn Animationen von den alten Namen abhängen.
+- **Skip Locked Shape Keys** lässt die Shape Keys unangetastet, die in der Shape-Key-Liste von Blender mit dem Schloss-Symbol gesperrt wurden.
+
+Ist Google nicht erreichbar oder blockiert eine Zeit lang, wendet Cats trotzdem sein Wörterbuch an und meldet, dass einige Teile nicht übersetzt werden konnten. Den Rest später erneut versuchen. Der Cache lässt sich in [Settings & Updates](../settings/) leeren.
+
+## Show More Options
+
+### Normalen
+
+- **Recalculate** richtet die Normalen des aktiven Meshes wieder nach außen. Verwenden, wenn einige Flächen invertiert oder dunkler aussehen. Nicht auf Meshes anwenden, die bereits richtig aussehen.
+- **Flip** kehrt alle Normalen um, für Meshes, die komplett nach innen gekehrt sind.
+
+### Transformationen
+
+**Apply Transformations** wendet Position, Rotation und Maßstab auf die Armatur und ihre Meshes an. Der kleine Button daneben wendet sie auf alle Objekte der Szene an.
+
+### Shape Keys
+
+- **Remove Unused Shapekeys** löscht die Shape Keys des aktiven Meshes, die keinen Vertex bewegen. `vrc.v_sil` bleibt immer erhalten. Das Mesh muss im Object mode ausgewählt sein.
+- **Repair Broken Shapekeys** versucht, Shape Keys zu reparieren, die durch bestimmte Blender-Operationen beschädigt wurden.
+- **Optimize Static Shapekeys** verschiebt den Teil des Meshes, den Shape Keys beeinflussen, in ein eigenes Mesh und entfernt die Shape Keys vom Rest, der in `Static` umbenannt wird. Das senkt die GPU-Last des Avatars. Die Meshes vorher vereinen: Cats verweigert die Ausführung auf mehreren Meshes.
+- **Fix Koikatsu Shapekeys** repariert die Shape Keys von Modellen aus Koikatsu.
+
+Das Shape-Key-Menü in den Object Data Properties von Blender erhält außerdem zwei Einträge von Cats: **Apply Selected Shapekey to Basis**, das den ausgewählten Key in Basis einbrennt und eine umgekehrte Kopie behält, und **Remove Unused Shapekeys**.
+
+### Knochen
+
+- **Create Digitigrade Legs** verwandelt ein Bein in ein digitigrades Bein, für tierähnliche Avatare. Zuerst zwei Knochen im Edit mode auswählen; der Link **How to use** öffnet ein Tutorial.
+- **Generate Twist Bones** fügt den ausgewählten Knochen Twist-Knochen hinzu und teilt ihre Gewichte auf. **Upper Body** bezieht auch Wirbelsäule und Hals ein.
+- **Convert Bones To Valve** benennt die Hauptknochen nach den Namen der Source Engine um. Das Modell braucht zuvor die Standardnamen aus [Fix MMD Model](../mmd-options/).

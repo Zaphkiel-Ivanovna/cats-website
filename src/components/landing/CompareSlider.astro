@@ -1,0 +1,154 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+	before: ImageMetadata;
+	after: ImageMetadata;
+	beforeLabel: string;
+	afterLabel: string;
+	alt: string;
+}
+
+const { before, after, beforeLabel, afterLabel, alt } = Astro.props;
+const widths = [540, 1080, before.width];
+const sizes = '(max-width: 1100px) 100vw, 1080px';
+---
+
+<div class="compare" role="group" aria-label={alt} style="--pos: 50%">
+	<Image src={before} alt="" {widths} {sizes} class="layer" />
+	<Image src={after} alt="" {widths} {sizes} class="layer after" />
+	<span class="label left">{beforeLabel}</span>
+	<span class="label right">{afterLabel}</span>
+	<span class="handle" aria-hidden="true">
+		<span class="grip"></span>
+	</span>
+	<input
+		type="range"
+		min="0"
+		max="100"
+		value="50"
+		step="0.5"
+		aria-label={`${beforeLabel} / ${afterLabel}`}
+	/>
+</div>
+
+<style>
+	.compare {
+		position: relative;
+		overflow: hidden;
+		border-radius: 10px;
+		border: 1px solid var(--sl-color-gray-5);
+		user-select: none;
+		touch-action: pan-y;
+	}
+	.compare :global(.layer) {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+	.compare :global(.after) {
+		position: absolute;
+		inset: 0;
+		clip-path: inset(0 0 0 var(--pos));
+	}
+	.label {
+		position: absolute;
+		top: 0.75rem;
+		padding: 0.2rem 0.55rem;
+		border-radius: 6px;
+		background: rgb(13 17 23 / 0.72);
+		font-size: var(--sl-text-xs);
+		color: #dde2e9;
+		pointer-events: none;
+	}
+	.left {
+		left: 0.75rem;
+	}
+	.right {
+		right: 0.75rem;
+		color: #ffb583;
+	}
+	.handle {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: var(--pos);
+		width: 2px;
+		translate: -1px 0;
+		background: var(--sl-color-accent);
+		pointer-events: none;
+	}
+	.grip {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 2.25rem;
+		height: 2.25rem;
+		translate: -50% -50%;
+		border-radius: 50%;
+		border: 2px solid var(--sl-color-accent);
+		background:
+			linear-gradient(
+					90deg,
+					transparent 38%,
+					var(--sl-color-accent) 38% 44%,
+					transparent 44% 56%,
+					var(--sl-color-accent) 56% 62%,
+					transparent 62%
+				)
+				center / 60% 40% no-repeat,
+			rgb(13 17 23 / 0.85);
+	}
+	input {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		opacity: 0;
+		cursor: ew-resize;
+	}
+	.compare:has(input:focus-visible) .grip {
+		outline: 2px solid var(--sl-color-white);
+		outline-offset: 3px;
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.compare.is-hinting {
+			transition: --pos 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+		}
+	}
+</style>
+
+<style is:global>
+	@property --pos {
+		syntax: '<percentage>';
+		inherits: true;
+		initial-value: 50%;
+	}
+</style>
+
+<script>
+	for (const box of document.querySelectorAll<HTMLElement>('.compare')) {
+		const input = box.querySelector('input')!;
+		const set = (value: number) => box.style.setProperty('--pos', `${value}%`);
+		input.addEventListener('input', () => {
+			box.classList.remove('is-hinting');
+			set(Number(input.value));
+		});
+
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) continue;
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (!entry.isIntersecting) return;
+				observer.disconnect();
+				box.classList.add('is-hinting');
+				set(72);
+				setTimeout(() => set(Number(input.value)), 950);
+				setTimeout(() => box.classList.remove('is-hinting'), 1900);
+			},
+			{ threshold: 0.6 },
+		);
+		observer.observe(box);
+	}
+</script>

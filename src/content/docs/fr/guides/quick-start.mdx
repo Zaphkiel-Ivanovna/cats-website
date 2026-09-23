@@ -1,0 +1,71 @@
+---
+title: Démarrage rapide
+description: Amenez un modèle de l'import à un FBX prêt pour VRChat avec Cats, étape par étape, et sachez quelles étapes sauter pour les modèles déjà faits pour Unity.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Ce guide fait passer un modèle par Cats, de l'import jusqu'à un FBX que vous pouvez déposer dans Unity. Il suppose que Cats est [installé](../install/) et que l'onglet CATS est ouvert dans la barre latérale du 3D Viewport (<kbd>N</kbd>).
+
+<Shot
+	name="hero"
+	alt="Blender 5.1 avec un avatar VRoid dans le viewport, et les panneaux Quick Access et MMD Options ouverts dans l'onglet CATS."
+	caption="L'onglet CATS dans la barre latérale du 3D Viewport, ici avec Quick Access et MMD Options ouverts."
+/>
+
+## Quel type de modèle avez-vous ?
+
+La marche à suivre dépend de la provenance du modèle :
+
+<Tabs>
+<TabItem label="Import brut (MMD, VRM...)">
+
+Un modèle tout droit sorti de MMD, VRM, XNALara ou d'un jeu, avec ses os et sa physique d'origine. Il a besoin du traitement complet, y compris **Fix MMD Model**.
+
+</TabItem>
+<TabItem label="Fait pour Unity (Booth, Gumroad...)">
+
+Un avatar déjà riggé pour Unity et VRChat. **N'exécutez pas Fix MMD Model dessus** : il renommerait et supprimerait des os dont l'avatar a besoin. Sautez l'étape 2 et utilisez Cats pour l'optimisation, les visèmes et l'export.
+
+</TabItem>
+</Tabs>
+
+## De l'import à l'export
+
+<Steps>
+
+1. **Importez le modèle.** Dans [Quick Access](../../tools/quick-access/), cliquez sur **Import Model** et choisissez le fichier : `.pmx`, `.vrm`, `.fbx`, `.xps`, un `.zip`, etc. Importez toujours via Cats : Fix MMD Model attend le résultat de son propre importeur.
+
+2. **Réparez-le (imports bruts uniquement).** Ouvrez [MMD Options](../../tools/mmd-options/) et cliquez sur **Fix MMD Model**. Cats traduit et renomme les os selon un squelette standard, fusionne les os auxiliaires, joint les maillages, nettoie les shape keys et supprime la physique MMD. Vérifiez le résultat en mode Pose (étape 6).
+
+3. **Traduisez le reste.** Si des matériaux, objets ou shape keys portent encore des noms japonais, cliquez sur **All** sous **Translate** dans [Other Options](../../tools/other-options/).
+
+4. **Optimisez.** Dans [Optimization](../../tools/optimization/) :
+   - Cliquez sur **Combine Same Materials** pour fusionner les matériaux identiques.
+   - S'il reste plus de quatre matériaux, créez un atlas avec Material Combiner dans **Atlas Generation**.
+   - Assurez-vous que le modèle tient en un seul maillage, deux au maximum : **Join Meshes > All**.
+   - Réduisez les os de physique avec **Merge Bones** si vous avez beaucoup de chaînes de cheveux ou de jupe.
+
+5. **Ajoutez la synchronisation labiale.** Dans [Visemes](../../tools/visemes/), choisissez trois formes de bouche et cliquez sur **Create Visemes** pour obtenir les quinze shape keys `vrc.v_*`.
+
+6. **Vérifiez comment il bouge.** Dans [Quick Access](../../tools/quick-access/#mode-pose), cliquez sur **Start Pose Mode** et faites pivoter quelques os : bras, jambes, tête, doigts. Cliquez sur **Stop Pose Mode** quand vous avez terminé.
+
+7. **Préparez les yeux.** Pour VRChat, ouvrez [Eye Tracking](../../tools/eye-tracking/), choisissez les deux os des yeux sous **SDK3 Eye Tracking** et cliquez sur **Rotate eye bones**. Le reste du suivi oculaire se configure dans Unity.
+
+8. **Exportez.** Dans [Quick Access](../../tools/quick-access/#export-model), cliquez sur **Export Model**, puis à nouveau sur **Export Model** dans la fenêtre qui s'ouvre. Lisez les avertissements de Cats sur les polygones, les matériaux ou les maillages : chacun vous indique ce que VRChat va vous reprocher. Enregistrez le FBX.
+
+</Steps>
+
+## Dans Unity
+
+Déposez le FBX dans votre projet Unity, réglez le rig sur **Humanoid** dans les paramètres d'import et ajoutez le descripteur d'avatar VRChat. Comme Cats a nommé les os et les shape keys comme Unity et le SDK VRChat l'attendent, le mappage humanoïde et la détection automatique des visèmes devraient se remplir tout seuls.
+
+<Aside type="tip">
+	Conservez le fichier `.blend`. Si vous devez modifier quelque chose plus tard, il est bien plus
+	simple de le corriger là et de réexporter que de refaire toute la chaîne depuis le modèle
+	d'origine.
+</Aside>
+
+Un problème ? Consultez le [dépannage](../troubleshooting/).

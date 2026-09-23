@@ -1,0 +1,40 @@
+.landing h1,
+.landing h2,
+.landing h3,
+.landing p {
+	margin-bottom: 0;
+}
+
+.landing .block {
+	margin-top: 4.5rem;
+	padding-top: 2.5rem;
+	border-top: 1px solid var(--sl-color-gray-5);
+}
+
+.landing .block h2 {
+	font-size: clamp(1.6rem, 3vw, 2.1rem);
+	font-weight: 600;
+	line-height: 1.15;
+	letter-spacing: -0.025em;
+	color: var(--sl-color-white);
+	text-wrap: balance;
+}
+
+.landing .block .intro {
+	margin-top: 0.75rem;
+	max-width: 60ch;
+	line-height: 1.65;
+	color: var(--sl-color-gray-2);
+}
+
+@media (max-width: 40rem) {
+	.landing .block {
+		margin-top: 3rem;
+		padding-top: 2rem;
+	}
+}
+
+.landing .finale {
+	position: relative;
+	padding-bottom: 16rem;
+}

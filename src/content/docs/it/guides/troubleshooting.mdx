@@ -1,0 +1,100 @@
+---
+title: Risoluzione dei problemi
+description: Cosa significano i messaggi di errore più comuni di Cats e come superarli.
+sourceUpdated: 2026-09-23
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Cats mostra gli errori in un popup intitolato **Report: Error**, oppure nella barra di stato di Blender. Ecco quelli che capitano più spesso, con la soluzione.
+
+## Errori di modello e mesh
+
+<details>
+<summary>No meshes found!</summary>
+
+Cats conta solo le mesh **imparentate all'armatura**. Una mesh che sta accanto all'armatura nell'Outliner, ma non sotto di essa, viene ignorata. Seleziona la mesh, poi l'armatura, premi <kbd>Ctrl</kbd> + <kbd>P</kbd> e scegli **With Empty Groups** oppure **Object**, a seconda che abbia già dei pesi o no.
+
+Fix MMD Model dice la stessa cosa a modo suo: **No mesh inside the armature found!**
+
+</details>
+
+<details>
+<summary>Your Objects/ Meshes are not Single User</summary>
+
+Due oggetti condividono gli stessi dati di mesh o di armatura, di solito dopo una duplicazione con <kbd>Alt</kbd> + <kbd>D</kbd>. Seleziona tutti gli oggetti, esegui **Object > Relations > Make Single User > Object & Data** e riprova.
+
+</details>
+
+<details>
+<summary>Rigify and Metarig armatures are not supported</summary>
+
+Fix MMD Model rifiuta i rig creati con Rigify, riconosciuti dal nome `metarig` o da ossa che iniziano con `DEF-`, `MCH-` o `ORG-`. Usa invece un'estensione Rigify-to-Unity per convertire il rig. Se il tuo rig non è un rig Rigify, rinomina le ossa e l'armatura in modo che non usino quei nomi.
+
+</details>
+
+<details>
+<summary>The following bones were not found</summary>
+
+Compare alla fine di Fix MMD Model quando alcune ossa principali, come una gamba o il collo, non sono state identificate. La correzione viene comunque completata. Rinomina a mano le ossa mancanti con i nomi standard (`Left leg`, `Neck` e così via) e controlla la gerarchia. Se il modello non è stato modificato, il progetto upstream accetta volentieri le segnalazioni per poterlo supportare.
+
+</details>
+
+## Errori di importazione
+
+<details>
+<summary>XPS Tools / Source Tools / VRM Importer is not installed or enabled!</summary>
+
+Cats si appoggia a estensioni separate per questi formati. Clicca il pulsante di download nella finestra, installa l'estensione in **Edit > Preferences > Add-ons**, attivala e importa di nuovo.
+
+</details>
+
+<details>
+<summary>The FBX file version is unsupported!</summary>
+
+L'FBX è troppo vecchio per l'importer di Blender. Convertilo in una versione FBX più recente con uno strumento come Autodesk FBX Converter.
+
+</details>
+
+## Errori di traduzione
+
+<details>
+<summary>Could not connect to Google / banned from Google Translate temporarily</summary>
+
+Cats ha tradotto quello che poteva con il suo dizionario integrato, ma Google ha rifiutato il resto, spesso dopo molte richieste di fila. Aspetta un po' e clicca di nuovo **Translate**: vengono inviati solo i nomi mancanti. Controlla che Blender abbia il permesso di andare online.
+
+</details>
+
+## Avvisi di esportazione
+
+Gli avvisi che Cats mostra prima dell'esportazione sono consigli, non errori: puoi cliccare **Continue to Export**. Corrispondono ai criteri con cui VRChat valuta le prestazioni degli avatar. Consulta la tabella in [Export Model](../../tools/quick-access/#controlli-prima-di-esportare).
+
+**Broken shapekeys!** è l'eccezione: VRChat rifiuta di caricare un avatar con quelle shape key. Eliminale, oppure prova **Repair Broken Shapekeys** in [Other Options](../../tools/other-options/).
+
+## Eye tracking e visemi
+
+<details>
+<summary>Eye tracking will not work unless the bone hierarchy is exactly as following</summary>
+
+Eye tracking legacy: la catena deve essere Hips > Spine > Chest > Neck > Head, l'armatura deve chiamarsi `Armature` e la mesh degli occhi `Body`.
+
+</details>
+
+<details>
+<summary>Please select the correct mouth shapekeys instead of "Basis"!</summary>
+
+Visemi: scegli shape key che aprono davvero la bocca.
+
+</details>
+
+## Messaggi che sembrano codice
+
+Alcuni messaggi compaiono come chiavi grezze, per esempio `VisemePanel.error.noShapekeys` o `RemoveDoubles.error.failed`. Significa che manca il testo inglese nel file di traduzione dell'estensione. Di solito la chiave dice cosa è successo: qui, la mesh non ha shape key, oppure la rimozione dei doppioni è fallita.
+
+<Aside type="tip">
+	Sei ancora bloccato? Apri una issue su
+	[GitHub](https://github.com/Zaphkiel-Ivanovna/cats-blender-plugin-unofficial/issues) indicando la
+	tua versione di Blender, il messaggio e cosa hai cliccato. Per problemi non specifici di Blender
+	5.x, il [progetto upstream](https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-/issues)
+	è il posto giusto.
+</Aside>

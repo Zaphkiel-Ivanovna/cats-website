@@ -1,0 +1,125 @@
+---
+title: Eye Tracking
+description: Augenknochen für das Eye Tracking von VRChat SDK3 vorbereiten oder das alte Setup aus Knochen und Shape Keys erstellen, das andere Spiele noch nutzen.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Das Panel **Eye Tracking** hat zwei Teile. Welcher benötigt wird, hängt davon ab, wo der Avatar eingesetzt wird:
+
+| Teil                    | Einsatzzweck                                                | Wirkung                                                                                                 |
+| ----------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **SDK3 Eye Tracking**   | VRChat-Avatare (Avatars 3.0)                                | Dreht die Augenknochen so, dass sich die Blicksteuerung in Unity einfach einrichten lässt.              |
+| **Legacy Eye Tracking** | ChilloutVR und andere Spiele, die noch das alte Setup lesen | Erstellt neue Knochen `LeftEye` und `RightEye` sowie die Shape Keys `vrc.blink_*` und `vrc.lowerlid_*`. |
+
+<Aside type="danger" title="Legacy Eye Tracking nicht für VRChat verwenden">
+	VRChat richtet das Eye Tracking in Unity über den Avatar Descriptor ein. Das alte Setup wurde für
+	das alte SDK entwickelt und sollte bei VRChat-SDK3-Avataren nicht verwendet werden.
+</Aside>
+
+## SDK3 Eye Tracking
+
+Für VRChat muss Cats die Augenknochen nur gerade nach oben ausrichten, ohne Roll. Die Blickeinstellungen von Unity verhalten sich dann bei jedem Modell gleich.
+
+<Shot
+	name="panel-eye-sdk3"
+	alt="Der Bereich SDK3 Eye Tracking mit Left Eye auf Eye_L, Right Eye auf Eye_R und dem Button Rotate eye bones."
+/>
+
+<Steps>
+
+1. Unter **Left Eye** und **Right Eye** die Augenknochen des Modells wählen. Nach [Fix MMD Model](../mmd-options/) heißen sie `Eye_L` und `Eye_R`.
+
+2. Auf **Rotate eye bones** klicken.
+
+</Steps>
+
+Cats meldet **Eye bones rotated.** oder, wenn nichts zu tun war, **Eye bones are already rotated for VRChat, no changes were made.** Der Kopf jedes Knochens bleibt an seiner Stelle, an die Augen angehängte Kindknochen werden getrennt, und X-Axis Mirror wird danach wieder eingeschaltet, falls es vorher aktiv war.
+
+Der Button bleibt deaktiviert, bis beide Augenknochen gesetzt sind. Befindet sich ein anderes Objekt im Edit mode, diesen zuerst verlassen oder die Armatur im Edit mode öffnen.
+
+## Legacy Eye Tracking
+
+Das alte Setup fügt Augenbewegung und Blinzeln über Knochen und Shape Keys hinzu. Es hat zwei Modi: Zuerst wird es erstellt, dann schaltet Cats das Panel in den Testmodus.
+
+<Shot
+	name="panel-eye-legacy"
+	alt="Der Bereich Legacy Eye Tracking im Erstellungsmodus: die Knochen Head, Left Eye und Right Eye, vier Shape Keys für Blinzeln und Unterlider, die beiden Disable-Optionen, Eye Movement Range und Create Eye Tracking."
+/>
+
+### Voraussetzungen
+
+Cats prüft diese Punkte vor dem Start und bricht beim ersten fehlgeschlagenen ab:
+
+- Das Mesh mit den Augen ist der Armatur untergeordnet und hat Shape Keys.
+- Das Mesh hat Vertex-Gruppen für beide Augen, deren Namen `LeftEye`, `Eye_L`, `eye.L`, `EyeLeft`, `left_eye` oder `l_eye` enthalten, sowie die Entsprechungen für die rechte Seite.
+- Die Knochen **Head**, **Left Eye** und **Right Eye** existieren in der Armatur.
+- Die Knochenkette lautet genau **Hips > Spine > Chest > Neck > Head**.
+- Damit das Spiel es findet, muss die Armatur `Armature` heißen und das Mesh mit den Augen `Body`. Cats benennt die Armatur beim Erstellen des Eye Trackings in `Armature` um, und **Join all meshes** in [Quick Access](../quick-access/) benennt das vereinte Mesh `Body`.
+
+Jede Dezimierung **vor** diesem Schritt durchführen. Cats erstellt die neuen Augenknochen aus den aktuellen Vertex-Gruppen, spätere Änderungen am Mesh können sie also zerstören.
+
+### Erstellen
+
+<Steps>
+
+1. Das **Mesh** mit den Augen wählen, falls es mehrere gibt.
+
+2. **Head**, **Left Eye** und **Right Eye** auf die vorhandenen Knochen setzen.
+
+3. Die vier Shape Keys festlegen:
+
+   | Feld               | Shape Key                                                                                     |
+   | ------------------ | --------------------------------------------------------------------------------------------- |
+   | **Blink Left**     | Das linke Auge geschlossen.                                                                   |
+   | **Blink Right**    | Das rechte Auge geschlossen.                                                                  |
+   | **Lowerlid Left**  | Das linke Unterlid leicht angehoben. Auf `Basis` setzen, um die Unterlidbewegung auszulassen. |
+   | **Lowerlid Right** | Dasselbe für die rechte Seite.                                                                |
+
+4. Bei Bedarf die Optionen anpassen:
+   - **Disable Eye Blinking** behält nur die Augenbewegung. Cats erstellt die Blinzel-Keys trotzdem, aber leer.
+   - **Disable Eye Movement** behält nur das Blinzeln. Beide Optionen lassen sich nicht gleichzeitig aktivieren.
+   - **Eye Movement Range** (Standard `0.8`) legt fest, wie weit sich die Augen drehen können. Zu wenig oder zu viel führt zu Darstellungsfehlern.
+
+5. Auf **Create Eye Tracking** klicken.
+
+</Steps>
+
+Cats erstellt zwei neue Knochen, `LeftEye` und `RightEye`, die Head untergeordnet sind und nach oben zeigen. Jeder neue Knochen wird je nach **Eye Movement Range** zwischen dem alten Augenknochen und der Mitte des Augen-Meshes platziert. Anschließend kopiert Cats die Augen-Vertex-Gruppen auf die neuen Knochen und erstellt aus den gewählten Shape Keys `vrc.blink_left`, `vrc.blink_right`, `vrc.lowerlid_left` und `vrc.lowerlid_right`, wobei ältere Keys mit denselben Namen ersetzt werden.
+
+Bei Erfolg meldet es **Created eye tracking!**, und das Panel wechselt in den Testmodus. Stimmt die Knochenkette nicht, nennt Cats den falsch untergeordneten Knochen und bleibt im Erstellungsmodus.
+
+### Testen
+
+<Tabs>
+<TabItem label="Augenbewegung">
+
+1. Auf **Start Eye Testing** klicken. Cats wechselt in den Pose mode, setzt jede Pose zurück und blendet alle Knochen außer den beiden Augen aus.
+2. **Up - Down** und **Left - Right** verschieben, um sich umzusehen. Die Werte sind in Grad angegeben.
+3. Drehen sich die Augen zu weit oder nicht weit genug, **Eye Movement Range** ändern und auf **Set Range** klicken. Cats verschiebt die Augenknochen erneut und übernimmt den neuen Bereich.
+4. Auf **Reset Rotation** klicken, um wieder geradeaus zu blicken.
+
+</TabItem>
+<TabItem label="Blinzeln">
+
+1. **Blink Strength** einstellen und auf **Test** daneben klicken, um beide Blinzel-Keys gemeinsam in der Vorschau zu sehen.
+2. Mit **Lowerlid Strength** für die Unterlider ebenso verfahren.
+3. Auf **Reset Shapes** klicken, um alle Shape Keys auf 0 zurückzusetzen.
+
+</TabItem>
+</Tabs>
+
+Zum Abschluss auf **Stop Eye Testing** klicken: Die Knochen werden wieder eingeblendet, die Testpose gelöscht und der Object mode wiederhergestellt. **Reset Eye Tracking Panel** setzt das Panel in den Erstellungsmodus zurück. Im Spiel oder in der Engine `LeftEye` und `RightEye` als Augenknochen zuweisen.
+
+### Fehlerbehebung
+
+Das Panel enthält eine kurze Checkliste, die die meisten Fehler abdeckt:
+
+- Das Mesh hat Augen-Vertex-Gruppen mit den oben genannten Namen.
+- Die Shape Keys sind korrekt benannt und in den Feldern ausgewählt.
+- Die Augenknochen sind tatsächlich auf die Augen gewichtet. Im Pose mode sollte ihre Drehung die Augen bewegen.
+- Die Armatur befindet sich in der Ruheposition.
+
+Meldet **Set Range**, dass ein Knochen keine Vertex-Gruppe oder keine zugewiesenen Vertices hat, wurde das falsche Mesh oder der falsche Knochen gewählt, oder die Meshes wurden vor dem Erstellen des Eye Trackings nicht vereint.

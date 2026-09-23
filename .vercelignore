@@ -1,0 +1,6 @@
+.ruff_cache/
+.astro/
+dist/
+scripts/screenshots/
+.yarn/cache/
+.yarn/install-state.gz

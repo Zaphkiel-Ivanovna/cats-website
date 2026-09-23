@@ -1,0 +1,70 @@
+---
+title: Szybki start
+description: Przeprowadź model w Cats krok po kroku od importu do pliku FBX gotowego do VRChat i dowiedz się, które kroki pominąć w modelach przygotowanych już dla Unity.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Ten przewodnik prowadzi model przez Cats od importu do pliku FBX, który można wrzucić do Unity. Zakłada, że Cats jest [zainstalowany](../install/), a karta CATS jest otwarta na pasku bocznym 3D Viewport (<kbd>N</kbd>).
+
+<Shot
+	name="hero"
+	alt="Blender 5.1 z awatarem VRoid w widoku 3D oraz otwartymi panelami Quick Access i MMD Options na karcie CATS."
+	caption="Karta CATS na pasku bocznym 3D Viewport, tutaj z otwartymi panelami Quick Access i MMD Options."
+/>
+
+## Jaki masz model?
+
+Ścieżka zależy od tego, skąd pochodzi model:
+
+<Tabs>
+<TabItem label="Surowy import (MMD, VRM...)">
+
+Model prosto z MMD, VRM, XNALara lub gry, z oryginalnymi kośćmi i fizyką. Wymaga pełnej obróbki, łącznie z **Fix MMD Model**.
+
+</TabItem>
+<TabItem label="Przygotowany dla Unity (Booth, Gumroad...)">
+
+Awatar z riggiem przygotowanym już dla Unity i VRChat. **Nie uruchamiaj na nim Fix MMD Model**: zmieniłoby to nazwy kości, na których opiera się awatar, i usunęło część z nich. Pomiń krok 2 i używaj Cats do optymalizacji, wizemów i eksportu.
+
+</TabItem>
+</Tabs>
+
+## Od importu do eksportu
+
+<Steps>
+
+1. **Zaimportuj model.** W [Quick Access](../../tools/quick-access/) kliknij **Import Model** i wybierz plik: `.pmx`, `.vrm`, `.fbx`, `.xps`, `.zip` i tak dalej. Zawsze importuj przez Cats: Fix MMD Model oczekuje wyniku działania własnego importera.
+
+2. **Napraw go (tylko surowe importy).** Otwórz [MMD Options](../../tools/mmd-options/) i kliknij **Fix MMD Model**. Cats tłumaczy kości i przemianowuje je na standardowy szkielet, scala kości pomocnicze, łączy siatki, porządkuje shape keys i usuwa fizykę MMD. Sprawdź wynik w trybie pozy (krok 6).
+
+3. **Przetłumacz resztę.** Jeśli materiały, obiekty lub shape keys nadal mają japońskie nazwy, kliknij **All** w sekcji **Translate** w [Other Options](../../tools/other-options/).
+
+4. **Zoptymalizuj.** W [Optimization](../../tools/optimization/):
+   - Kliknij **Combine Same Materials**, aby scalić identyczne materiały.
+   - Jeśli zostały więcej niż cztery materiały, zbuduj atlas za pomocą Material Combiner w **Atlas Generation**.
+   - Upewnij się, że model to jedna siatka, najwyżej dwie: **Join Meshes > All**.
+   - Jeśli masz wiele łańcuchów włosów lub spódnicy, zmniejsz liczbę kości fizyki za pomocą **Merge Bones**.
+
+5. **Dodaj synchronizację ust.** W [Visemes](../../tools/visemes/) wybierz trzy kształty ust i kliknij **Create Visemes**, aby otrzymać piętnaście shape keys `vrc.v_*`.
+
+6. **Sprawdź, jak się porusza.** W [Quick Access](../../tools/quick-access/#tryb-pozy) kliknij **Start Pose Mode** i obróć kilka kości: ręce, nogi, głowę, palce. Na koniec kliknij **Stop Pose Mode**.
+
+7. **Przygotuj oczy.** Dla VRChat otwórz [Eye Tracking](../../tools/eye-tracking/), wybierz obie kości oczu w **SDK3 Eye Tracking** i kliknij **Rotate eye bones**. Resztę śledzenia oczu konfiguruje się w Unity.
+
+8. **Wyeksportuj.** W [Quick Access](../../tools/quick-access/#export-model) kliknij **Export Model**, a potem ponownie **Export Model** w okienku. Przeczytaj każde ostrzeżenie Cats dotyczące wielokątów, materiałów lub siatek: każde mówi, na co będzie narzekać VRChat. Zapisz plik FBX.
+
+</Steps>
+
+## W Unity
+
+Wrzuć plik FBX do projektu Unity, w ustawieniach importu ustaw rig na **Humanoid** i dodaj deskryptor awatara VRChat. Ponieważ Cats nazwał kości i shape keys tak, jak oczekują tego Unity i VRChat SDK, mapowanie humanoidalne i automatyczne wykrywanie wizemów powinny uzupełnić się same.
+
+<Aside type="tip">
+	Zachowaj plik `.blend`. Jeśli później trzeba będzie coś zmienić, znacznie łatwiej poprawić to w
+	nim i wyeksportować ponownie, niż powtarzać cały proces od oryginalnego modelu.
+</Aside>
+
+Coś poszło nie tak? Zobacz [Rozwiązywanie problemów](../troubleshooting/).

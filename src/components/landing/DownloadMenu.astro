@@ -1,0 +1,244 @@
+---
+import { Icon } from 'astro-icon/components';
+import { releases, releasesUrl } from '../../data/releases';
+
+interface Props {
+	id: string;
+	href: string;
+	label: string;
+	lang: string;
+	t: { toggle: string; title: string; latest: string; prerelease: string; all: string };
+}
+
+const { id, href, label, lang, t } = Astro.props;
+const date = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeZone: 'UTC' });
+const size = new Intl.NumberFormat(lang, {
+	style: 'unit',
+	unit: 'megabyte',
+	maximumFractionDigits: 1,
+});
+---
+
+<div class="split" data-download-menu>
+	<a class="main" {href}>
+		<Icon name="ph:download-simple-bold" />
+		{label}
+	</a>
+	<button
+		class="toggle"
+		type="button"
+		popovertarget={id}
+		aria-label={t.toggle}
+		aria-haspopup="menu"
+		aria-expanded="false"
+	>
+		<Icon name="ph:caret-down-bold" />
+	</button>
+	<div {id} popover class="menu" role="menu" aria-label={t.title}>
+		<p class="title">{t.title}</p>
+		<ul>
+			{releases.map((release) => (
+				<li>
+					<a role="menuitem" href={release.url}>
+						<span class="version">{release.version}</span>
+						{release.latest && <span class="badge latest">{t.latest}</span>}
+						{release.prerelease && <span class="badge">{t.prerelease}</span>}
+						<span class="meta">
+							<span>{date.format(new Date(release.date))}</span>
+							{release.size && <span>{size.format(release.size / 1e6)}</span>}
+						</span>
+					</a>
+				</li>
+			))}
+		</ul>
+		<a class="all" role="menuitem" href={releasesUrl}>
+			{t.all}
+			<Icon name="ph:arrow-up-right" />
+		</a>
+	</div>
+</div>
+
+<style>
+	.split {
+		display: inline-flex;
+		align-items: stretch;
+		border-radius: var(--cats-radius-control);
+	}
+	.main,
+	.toggle {
+		display: inline-flex;
+		align-items: center;
+		background: var(--cats-cta-bg);
+		color: var(--cats-cta-fg);
+		font-weight: 600;
+		font-size: var(--sl-text-base);
+		line-height: 1;
+		transition:
+			background-color 0.2s ease-out,
+			translate 0.2s var(--cats-ease);
+	}
+	.main {
+		gap: 0.55rem;
+		padding: 0.8rem 1rem 0.8rem 1.2rem;
+		border-radius: var(--cats-radius-control) 0 0 var(--cats-radius-control);
+		text-decoration: none;
+		white-space: nowrap;
+	}
+	.toggle {
+		justify-content: center;
+		padding: 0 0.7rem;
+		border: 0;
+		border-inline-start: 1px solid color-mix(in srgb, var(--cats-cta-fg) 25%, transparent);
+		border-radius: 0 var(--cats-radius-control) var(--cats-radius-control) 0;
+		cursor: pointer;
+	}
+	.main :global(svg) {
+		font-size: 1.15em;
+	}
+	.toggle :global(svg) {
+		font-size: 0.95em;
+		transition: rotate 0.2s var(--cats-ease);
+	}
+	.toggle[aria-expanded='true'] :global(svg) {
+		rotate: 180deg;
+	}
+	.main:hover,
+	.toggle:hover,
+	.toggle[aria-expanded='true'] {
+		background: color-mix(in srgb, var(--cats-cta-bg) 88%, var(--sl-color-white));
+	}
+	.main:focus-visible,
+	.toggle:focus-visible {
+		outline: 2px solid var(--sl-color-accent);
+		outline-offset: 3px;
+	}
+
+	.menu {
+		position: fixed;
+		inset: auto;
+		margin: 0;
+		min-width: 17rem;
+		padding: 0.4rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 10px;
+		background: var(--sl-color-black);
+		color: var(--sl-color-white);
+		box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.55);
+	}
+	.title {
+		margin: 0;
+		padding: 0.45rem 0.65rem 0.35rem;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+	}
+	ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	li {
+		margin: 0;
+	}
+	.menu a {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.55rem 0.65rem;
+		border-radius: 6px;
+		color: inherit;
+		text-decoration: none;
+	}
+	.menu a:hover,
+	.menu a:focus-visible {
+		background: var(--sl-color-gray-6);
+		outline: none;
+	}
+	.version {
+		font-family: var(--sl-font-mono);
+		font-weight: 600;
+	}
+	.badge {
+		padding: 0.1rem 0.4rem;
+		border-radius: 4px;
+		border: 1px solid var(--sl-color-gray-5);
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-2);
+	}
+	.badge.latest {
+		border-color: color-mix(in srgb, var(--sl-color-accent) 45%, transparent);
+		color: var(--sl-color-accent);
+	}
+	.meta {
+		display: inline-flex;
+		gap: 0.75rem;
+		margin-inline-start: auto;
+		padding-inline-start: 1rem;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+		white-space: nowrap;
+	}
+	.menu a.all {
+		margin-top: 0.25rem;
+		border-top: 1px solid var(--sl-color-gray-5);
+		border-radius: 0 0 6px 6px;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-accent);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.menu:popover-open {
+			transition:
+				opacity 0.18s ease-out,
+				translate 0.18s var(--cats-ease);
+			@starting-style {
+				opacity: 0;
+				translate: 0 -6px;
+			}
+		}
+	}
+</style>
+
+<script>
+	for (const root of document.querySelectorAll<HTMLElement>('[data-download-menu]')) {
+		const toggle = root.querySelector<HTMLButtonElement>('.toggle')!;
+		const menu = root.querySelector<HTMLElement>('.menu')!;
+		const items = () => [...menu.querySelectorAll<HTMLAnchorElement>('a[role="menuitem"]')];
+
+		const place = () => {
+			const box = root.getBoundingClientRect();
+			const width = Math.max(box.width, menu.offsetWidth);
+			const left = Math.min(box.left, window.innerWidth - width - 12);
+			const height = menu.offsetHeight;
+			const below = box.bottom + 6;
+			const fitsBelow = below + height + 12 <= window.innerHeight;
+			menu.style.left = `${Math.max(12, left)}px`;
+			menu.style.top = `${fitsBelow || box.top - height - 6 < 12 ? below : box.top - height - 6}px`;
+		};
+
+		menu.addEventListener('beforetoggle', (event) => {
+			const open = (event as ToggleEvent).newState === 'open';
+			toggle.setAttribute('aria-expanded', String(open));
+			if (!open) return;
+			place();
+			requestAnimationFrame(place);
+		});
+		menu.addEventListener('toggle', (event) => {
+			if ((event as ToggleEvent).newState === 'open') items()[0]?.focus({ preventScroll: true });
+		});
+		menu.addEventListener('keydown', (event) => {
+			if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+			event.preventDefault();
+			const list = items();
+			const index = list.indexOf(document.activeElement as HTMLAnchorElement);
+			const next = event.key === 'ArrowDown' ? index + 1 : index - 1;
+			list[(next + list.length) % list.length].focus();
+		});
+		window.addEventListener(
+			'scroll',
+			() => {
+				if (menu.matches(':popover-open')) menu.hidePopover();
+			},
+			{ passive: true },
+		);
+	}
+</script>

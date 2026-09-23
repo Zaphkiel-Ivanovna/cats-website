@@ -1,0 +1,83 @@
+hero:
+  title: Get imported models ready for VRChat.
+  lead: Cats takes the model an importer just dumped into Blender, renames its bones, merges its weights, joins its meshes and clears out the leftovers.
+  download: Download {version}
+  docs: Read the guide
+  meta: For Blender {series}. Free, under the GPL.
+  shotAlt: 'Blender 5.1 with a VRoid avatar in the viewport and the Quick Access and MMD Options panels of the CATS tab open in the sidebar.'
+  shotCaption: "Cats in Blender 5.1, on VRoid's CC0 sample avatar after Fix MMD Model."
+
+releases:
+  toggle: 'Choose a version'
+  title: 'All versions'
+  latest: 'Latest'
+  prerelease: 'Pre-release'
+  all: 'All releases on GitHub'
+
+fixModel:
+  title: Fix MMD Model does the heavy lifting
+  body: Run it once, right after importing an MMD or VRM model. Its bone lists also cover rigs from {rigs}. Skip it on avatars already set up for Unity, such as Booth or Gumroad models.
+  points:
+    - Translates bone names and renames them onto one standard skeleton.
+    - Moves the weights of helper bones onto the bones that stay, then deletes them.
+    - Rebuilds the Hips, Spine, Chest and Neck chain.
+    - Joins the meshes and removes shape keys that do nothing.
+    - Removes rigid bodies, joints and other MMD leftovers.
+  before: 'Imported'
+  after: 'After Fix MMD Model'
+  figureAlt: 'The same avatar twice. On the left its bones carry VRoid names such as J_Bip_C_Hips and J_Bip_L_UpperArm; on the right the same bones are named Hips, Left arm and Left knee.'
+  figureCaption: 'Spine and left side of the rig, before and after. The right side is renamed the same way.'
+
+panels:
+  title: Everything in the CATS tab
+  body: Each panel has its own page in the guide, in the order Blender shows them.
+  items:
+    quickAccess: Import and export models, combine materials, join meshes and test poses.
+    optimization: Material atlases, combining materials, joining meshes and merging bones.
+    customModel: Merge two armatures, or attach a mesh to a bone.
+    mmdOptions: Fix MMD Model and the other tools for fresh MMD and VRM imports.
+    otherOptions: Translation, separating meshes, normals and extra shape key tools.
+    visemes: Builds the fifteen vrc.v_* shape keys from three mouth shapes.
+    boneParenting: Groups similar bones under a new root bone, for physics bones.
+    modelScaling: Resizes the avatar through the Immersive Scaler add-on.
+    eyeTracking: Points eye bones up for VRChat SDK3, plus the legacy setup for other games.
+    settings: Export and translation settings, interface language and updates.
+
+fork:
+  title: What changed in this fork
+  body: This fork exists for the Blender 5.x work and follows upstream for everything else.
+  timing: Fix Model on a 323-bone, 14-mesh, 124k-vertex avatar, same model out.
+  before: before
+  after: now
+  items:
+    - title: Update checking works.
+      body: The version comparison stripped the Blender series off one side only, so no update was ever offered.
+    - title: Updates install through Blender.
+      body: The updater hands the package to Blender's extension installer instead of deleting its own files.
+    - title: Material slots keep their order.
+      body: The joined mesh keeps the same slot order on every run, so it lands in Unity the same way each time.
+    - title: TLS certificates are verified again.
+      body: The updater no longer turns off certificate checks for the whole session and every other add-on.
+  more: Around thirty other fixes are in the git history.
+
+install:
+  title: Install it as an extension
+  download:
+    title: Download the zip
+    body: Grab {file} from the latest release.
+  disk:
+    title: Install from Disk
+    body: Open the extension preferences, then use the dropdown at the top right.
+  tab:
+    title: Open the CATS tab
+    body: Press N in the 3D Viewport. Cats lives in the sidebar, under its own tab.
+  note: Blender only offers Cats to the versions it supports, and the add-on refuses to load anywhere else.
+
+credits:
+  title: Where Cats comes from
+  body: The combined work is GPL-3.0-or-later. Files with an MIT header come from the original project and keep it.
+  source: Source code
+  lineage:
+    origin: The original, by Hotox and GiveMeAllYourCats.
+    upstream: Carried by the Neoneko Team, one release line per Blender series.
+    fork: The Blender 5.x line, maintained by Zaphkiel-Ivanovna.

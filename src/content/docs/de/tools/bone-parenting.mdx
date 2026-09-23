@@ -1,0 +1,34 @@
+---
+title: Bone Parenting
+description: Ähnliche Geschwisterknochen, etwa Haarsträhnen oder Rockteile, unter einem neuen Wurzelknochen gruppieren, damit Physikkomponenten sie gemeinsam steuern können.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Physikkomponenten in Unity, etwa VRChat PhysBones, lassen sich am einfachsten einrichten, wenn eine ganze Gruppe von Ketten an einem einzigen Knochen hängt. **Bone Parenting** erstellt diesen Knochen automatisch.
+
+<Shot
+	name="panel-bone-parenting"
+	alt="Das Panel Bone Parenting mit der ausgewählten Knochengruppe J_Sec_L_SkirtSide1 und den Buttons Refresh List und Parent Bones."
+/>
+
+<Steps>
+
+1. **Bone Parenting** öffnen und eine Gruppe in der Liste wählen. Cats findet Geschwisterknochen, deren Namen sich zu mindestens 70 % ähneln, etwa `Hair_1`, `Hair_2` und `Hair_3`, und listet sie als `Hair (3 bones)`. Hauptknochen des Körpers werden nie aufgeführt.
+
+2. Auf **Parent Bones** klicken.
+
+</Steps>
+
+Cats erstellt einen Knochen namens `Root_<first bone>` an der Stelle des bisherigen Elternknochens der Gruppe und hängt alle Knochen der Gruppe darunter. Die Meldung lautet **Bones parented!** Nun lässt sich eine einzige Physikkomponente auf den `Root_`-Knochen setzen.
+
+`Root_`-Knochen sind geschützt: Cats löscht sie nie als Knochen ohne Gewichte.
+
+Die Liste wird zwischengespeichert. Nach dem Umbenennen, Hinzufügen oder Löschen von Knochen auf **Refresh List** klicken.
+
+<Aside type="caution">
+	Die Gruppe braucht einen Elternknochen. Liegen ihre Knochen ohne Elternknochen ganz oben in der
+	Hierarchie, schlägt der Vorgang fehl.
+</Aside>

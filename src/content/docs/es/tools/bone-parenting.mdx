@@ -1,0 +1,34 @@
+---
+title: Bone Parenting
+description: Agrupa huesos hermanos parecidos, como mechones de pelo o piezas de falda, bajo un nuevo hueso raíz para que los componentes de físicas los muevan juntos.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Los componentes de físicas de Unity, como los PhysBones de VRChat, son más fáciles de configurar cuando todo un grupo de cadenas cuelga de un único hueso. **Bone Parenting** crea ese hueso por ti.
+
+<Shot
+	name="panel-bone-parenting"
+	alt="El panel Bone Parenting con el grupo de huesos J_Sec_L_SkirtSide1 seleccionado y los botones Refresh List y Parent Bones."
+/>
+
+<Steps>
+
+1. Abre **Bone Parenting** y elige un grupo de la lista. Cats busca huesos hermanos cuyos nombres se parezcan al menos un 70 %, como `Hair_1`, `Hair_2` y `Hair_3`, y los muestra como `Hair (3 bones)`. Los huesos principales del cuerpo nunca aparecen.
+
+2. Haz clic en **Parent Bones**.
+
+</Steps>
+
+Cats crea un hueso llamado `Root_<first bone>` en el mismo sitio que el padre actual del grupo y mueve todos los huesos del grupo debajo de él. Muestra **Bones parented!** Ya puedes poner un solo componente de físicas en el hueso `Root_`.
+
+Los huesos `Root_` están protegidos: Cats nunca los borra como huesos sin pesos.
+
+La lista se guarda en caché. Haz clic en **Refresh List** después de renombrar, añadir o borrar huesos.
+
+<Aside type="caution">
+	El grupo necesita un hueso padre. Si sus huesos están en lo más alto de la jerarquía, sin padre,
+	la operación falla.
+</Aside>

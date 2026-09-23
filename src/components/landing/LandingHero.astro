@@ -1,0 +1,128 @@
+---
+import { Image } from 'astro:assets';
+import CtaButton from './CtaButton.astro';
+import DownloadMenu from './DownloadMenu.astro';
+import hero from '../../assets/screenshots/hero.png';
+import WireCat from './WireCat.astro';
+import { fill } from './fill';
+
+interface Props {
+	t: {
+		title: string;
+		lead: string;
+		download: string;
+		docs: string;
+		meta: string;
+		shotAlt: string;
+		shotCaption: string;
+	};
+	vars: Record<string, string>;
+	downloadUrl: string;
+	lang: string;
+	releases: { toggle: string; title: string; latest: string; prerelease: string; all: string };
+	docsHref: string;
+}
+
+const { t, vars, downloadUrl, docsHref, lang, releases } = Astro.props;
+
+const chars = t.title.length / 2;
+---
+
+<section class="hero">
+	<div class="copy">
+		<h1 id="_top" style={`--chars:${chars}`}>
+			{t.title}
+		</h1>
+		<p class="lead">{t.lead}</p>
+		<div class="actions">
+			<DownloadMenu
+				id="versions-hero"
+				href={downloadUrl}
+				label={fill(t.download, vars)}
+				{lang}
+				t={releases}
+			/>
+			<CtaButton href={docsHref} icon="ph:book-open" variant="secondary">
+				{t.docs}
+			</CtaButton>
+		</div>
+		<p class="meta">{fill(t.meta, vars)}</p>
+	</div>
+	<WireCat />
+</section>
+<figure class="product">
+	<Image
+		src={hero}
+		alt={t.shotAlt}
+		widths={[800, 1200, 1600, 2400]}
+		sizes="(max-width: 1100px) 100vw, 1080px"
+		loading="eager"
+	/>
+	<figcaption>{t.shotCaption}</figcaption>
+</figure>
+
+<style>
+	.hero {
+		display: grid;
+		grid-template-columns: 3fr 2fr;
+		align-items: center;
+		gap: 3rem;
+		padding-block: 4rem 3.5rem;
+	}
+	h1 {
+		font-size: clamp(2.25rem, min(5vw, 36rem / (var(--chars) * 0.55)), 3.5rem);
+		font-weight: 650;
+		line-height: 1.05;
+		letter-spacing: -0.035em;
+		color: var(--sl-color-white);
+		text-wrap: balance;
+	}
+	.lead {
+		margin-top: 1.5rem;
+		max-width: 36rem;
+		font-size: var(--sl-text-lg);
+		line-height: 1.6;
+		color: var(--sl-color-gray-2);
+	}
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-top: 2rem;
+	}
+	.meta {
+		margin-top: 1rem;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-3);
+	}
+
+	.product {
+		margin: 0;
+	}
+	.product :global(img) {
+		display: block;
+		width: 100%;
+		height: auto;
+		border-radius: 10px;
+		border: 1px solid var(--sl-color-gray-5);
+		box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.5);
+	}
+	.product figcaption {
+		margin-top: 0.75rem;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+	}
+
+	@media (max-width: 50rem) {
+		.hero {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+			padding-block: 2.5rem 1rem;
+		}
+		.hero > :global(.wirecat) {
+			max-width: 12rem;
+			margin-inline: 0;
+			order: -1;
+		}
+	}
+</style>

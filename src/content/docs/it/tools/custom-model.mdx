@@ -1,0 +1,75 @@
+---
+title: Custom Model Creation
+description: Unisci l'armatura di un modello a un'altra, per esempio per aggiungere un nuovo outfit o una parte del corpo, oppure attacca una singola mesh a un osso.
+sourceUpdated: 2026-09-23
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**Custom Model Creation** combina i modelli. Ha due sezioni: **Merge Armatures**, per unire due modelli riggati in uno solo, e **Attach Mesh**, per fissare un oggetto senza rig a un singolo osso.
+
+## Merge Armatures
+
+Usala per mettere un outfit, dei capelli o una parte del corpo riggati su un avatar. La sezione richiede almeno due armature nella scena; con meno, mostra solo **Two armatures are required!**
+
+### Prima di unire
+
+- Esegui [Fix MMD Model](../mmd-options/) su entrambi i modelli se sono importazioni grezze MMD o VRM, così le loro ossa condividono gli stessi nomi standard.
+- Sposta in posizione solo la **mesh** del modello che aggiungi. Cats sposta le sue ossa per farle combaciare con l'armatura di base.
+- Nessuna delle due armature può condividere i suoi dati con un altro oggetto. Se succede, esegui prima **Object > Relations > Make Single User**.
+
+### Unisci
+
+<Steps>
+
+1. In **Base**, scegli l'armatura che resta: di solito l'avatar.
+
+2. In **To Merge**, scegli l'armatura che stai aggiungendo.
+
+3. Se Cats mostra **Armatures can be merged automatically!**, le due condividono i nomi delle ossa principali e puoi proseguire. Altrimenti scegli in **Attach to** l'osso dell'armatura di base a cui agganciare la nuova parte.
+
+4. Imposta le opzioni, poi clicca **Merge Armatures**.
+
+</Steps>
+
+Cats segnala **Armatures successfully joined.** Le ossa con lo stesso nome vengono unite e i loro pesi sommati.
+
+| Opzione                      | Predefinito | Cosa fa                                                                                                                                                                                                           |
+| ---------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Merge All Bones**          | Off         | Unisce tutte le ossa con lo stesso nome, non solo quelle principali (Hips, Spine e così via). Rinomina le ossa che vuoi unire in modo che coincidano. Controlla il risultato dopo: può avere effetti collaterali. |
+| **Apply Transforms**         | Off         | Spuntala se entrambi i modelli sono già esattamente dove devono essere. Restano in posizione durante l'unione.                                                                                                    |
+| **Join Meshes**              | On          | Unisce tutte le mesh in una sola dopo l'unione.                                                                                                                                                                   |
+| **Remove Zero Weight Bones** | On          | Elimina le ossa che non muovono alcun vertice dopo l'unione.                                                                                                                                                      |
+| **Cleanup Shape Keys**       | On          | Rimuove le shape key che non fanno nulla. Toglila se spariscono shape key che vuoi tenere.                                                                                                                        |
+
+### Errori di trasformazione
+
+L'unione si aspetta entrambe le armature alla stessa scala e il modello che aggiungi senza rotazione. Se non è così, Cats si ferma con **Transform Issue Detected!** Spunta **Apply Transforms**, oppure seleziona entrambi gli oggetti e applica le loro trasformazioni con <kbd>Ctrl</kbd> + <kbd>A</kbd> > **All Transforms**.
+
+Se un'armatura ha un oggetto genitore, quel genitore deve trovarsi in posizione 0, rotazione 0 e scala 1, oppure avere le trasformazioni applicate.
+
+## Attach Mesh
+
+Usala per accessori rigidi: un cappello, degli occhiali, un'arma. La mesh non deve ancora avere un genitore.
+
+<Steps>
+
+1. In **Base**, scegli l'armatura.
+
+2. In **Mesh**, scegli la mesh senza genitore.
+
+3. In **Attach to**, scegli l'osso che deve seguire, per esempio Head per un cappello.
+
+4. Clicca **Attach Mesh**.
+
+</Steps>
+
+Cats imparenta la mesh all'armatura, crea sotto l'osso scelto un nuovo osso con il nome della mesh e assegna a quell'osso il peso dell'intera mesh. Segnala **Mesh successfully attached to armature.**
+
+<Aside type="caution">
+	Attach Mesh elimina i vertex group esistenti della mesh e assegna ogni vertice a un solo osso. Va
+	bene solo per oggetti rigidi: una giacca o una gonna hanno bisogno di più ossa e non si
+	deformeranno correttamente. Se la scala della mesh non è uniforme, applicala prima.
+</Aside>
+
+Il pulsante **How to use** in alto apre la documentazione upstream di questo pannello.

@@ -1,0 +1,125 @@
+---
+title: Eye Tracking
+description: Préparez les os des yeux pour le suivi oculaire du SDK3 de VRChat, ou créez la configuration legacy d'os et de shape keys que d'autres jeux utilisent encore.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Le panneau **Eye Tracking** (suivi oculaire) comporte deux parties, et celle dont vous avez besoin dépend de la destination de l'avatar :
+
+| Partie                  | À utiliser pour                                                    | Ce qu'elle fait                                                                                         |
+| ----------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| **SDK3 Eye Tracking**   | Les avatars VRChat (Avatars 3.0)                                   | Fait pivoter les os des yeux pour que la configuration du regard dans Unity soit simple.                |
+| **Legacy Eye Tracking** | ChilloutVR et les autres jeux qui lisent encore l'ancienne méthode | Crée de nouveaux os `LeftEye` et `RightEye` ainsi que les shape keys `vrc.blink_*` et `vrc.lowerlid_*`. |
+
+<Aside type="danger" title="N'utilisez pas Legacy Eye Tracking pour VRChat">
+	VRChat configure le suivi oculaire dans Unity, via le descripteur d'avatar. La méthode legacy a
+	été conçue pour l'ancien SDK et ne doit pas être utilisée sur des avatars VRChat SDK3.
+</Aside>
+
+## SDK3 Eye Tracking
+
+Pour VRChat, Cats n'a qu'à orienter les os des yeux vers le haut, sans roulis. Les réglages de regard de Unity se comportent alors de la même façon sur tous les modèles.
+
+<Shot
+	name="panel-eye-sdk3"
+	alt="La section SDK3 Eye Tracking avec Left Eye réglé sur Eye_L, Right Eye réglé sur Eye_R, et le bouton Rotate eye bones."
+/>
+
+<Steps>
+
+1. Dans **Left Eye** et **Right Eye**, choisissez les os des yeux du modèle. Après [Fix MMD Model](../mmd-options/), ils s'appellent `Eye_L` et `Eye_R`.
+
+2. Cliquez sur **Rotate eye bones**.
+
+</Steps>
+
+Cats affiche **Eye bones rotated.**, ou **Eye bones are already rotated for VRChat, no changes were made.** s'il n'y avait rien à faire. Il laisse la tête de chaque os à sa place, déconnecte les os enfants qui étaient rattachés aux yeux et réactive ensuite X-Axis Mirror si l'option était active.
+
+Le bouton reste désactivé tant que les deux os des yeux ne sont pas définis. Si un autre objet est en mode Edit, quittez-le d'abord ou ouvrez l'armature en mode Edit.
+
+## Legacy Eye Tracking
+
+La méthode legacy ajoute le mouvement des yeux et le clignement grâce à des os et des shape keys. Elle a deux modes : vous la créez, puis Cats bascule le panneau en mode test.
+
+<Shot
+	name="panel-eye-legacy"
+	alt="La section Legacy Eye Tracking en mode création : les os Head, Left Eye et Right Eye, quatre shape keys de clignement et de paupière inférieure, les deux options Disable, Eye Movement Range et Create Eye Tracking."
+/>
+
+### Prérequis
+
+Cats vérifie ces points avant de commencer, et s'arrête au premier qui échoue :
+
+- Le maillage des yeux est parenté à l'armature et possède des shape keys.
+- Le maillage a des groupes de sommets pour les deux yeux, dont les noms contiennent `LeftEye`, `Eye_L`, `eye.L`, `EyeLeft`, `left_eye` ou `l_eye`, et leurs équivalents côté droit.
+- Les os **Head**, **Left Eye** et **Right Eye** existent dans l'armature.
+- La chaîne d'os suit exactement **Hips > Spine > Chest > Neck > Head**.
+- Pour que le jeu la trouve, l'armature doit s'appeler `Armature` et le maillage des yeux `Body`. Cats renomme l'armature en `Armature` quand il crée le suivi oculaire, et **Join all meshes** dans [Quick Access](../quick-access/) nomme le maillage joint `Body`.
+
+Faites toute décimation **avant** cette étape. Cats crée les nouveaux os des yeux à partir des groupes de sommets actuels : modifier le maillage ensuite peut les casser.
+
+### Le créer
+
+<Steps>
+
+1. Choisissez le **Mesh** qui contient les yeux, s'il y en a plusieurs.
+
+2. Réglez **Head**, **Left Eye** et **Right Eye** sur les os existants.
+
+3. Réglez les quatre shape keys :
+
+   | Champ              | Shape key                                                                                          |
+   | ------------------ | -------------------------------------------------------------------------------------------------- |
+   | **Blink Left**     | L'œil gauche fermé.                                                                                |
+   | **Blink Right**    | L'œil droit fermé.                                                                                 |
+   | **Lowerlid Left**  | La paupière inférieure gauche légèrement relevée. Réglez-la sur `Basis` pour ignorer ce mouvement. |
+   | **Lowerlid Right** | Idem pour le côté droit.                                                                           |
+
+4. Ajustez les options si besoin :
+   - **Disable Eye Blinking** ne garde que le mouvement des yeux. Cats crée quand même les clés de clignement, mais vides.
+   - **Disable Eye Movement** ne garde que le clignement. Vous ne pouvez pas cocher les deux.
+   - **Eye Movement Range** (`0.8` par défaut) règle jusqu'où les yeux peuvent tourner. Trop peu ou trop les fait bugger.
+
+5. Cliquez sur **Create Eye Tracking**.
+
+</Steps>
+
+Cats crée deux nouveaux os, `LeftEye` et `RightEye`, parentés à Head et orientés vers le haut. Chaque nouvel os est placé entre l'ancien os de l'œil et le centre du maillage de l'œil, selon **Eye Movement Range**. Il copie ensuite les groupes de sommets des yeux vers les nouveaux os et crée `vrc.blink_left`, `vrc.blink_right`, `vrc.lowerlid_left` et `vrc.lowerlid_right` à partir de vos shape keys, en remplaçant les anciennes du même nom.
+
+En cas de succès, il affiche **Created eye tracking!** et le panneau passe en mode test. Si la chaîne d'os est incorrecte, Cats nomme l'os mal parenté et reste en mode création.
+
+### Le tester
+
+<Tabs>
+<TabItem label="Mouvement des yeux">
+
+1. Cliquez sur **Start Eye Testing**. Cats passe en mode Pose, réinitialise toutes les poses et masque tous les os sauf les deux yeux.
+2. Déplacez **Up - Down** et **Left - Right** pour regarder autour. Les valeurs sont en degrés.
+3. Si les yeux vont trop loin ou pas assez, modifiez **Eye Movement Range** et cliquez sur **Set Range**. Cats replace les os des yeux et conserve la nouvelle amplitude.
+4. Cliquez sur **Reset Rotation** pour regarder à nouveau droit devant.
+
+</TabItem>
+<TabItem label="Clignement">
+
+1. Réglez **Blink Strength** et cliquez sur **Test** à côté pour prévisualiser les deux clés de clignement ensemble.
+2. Faites de même avec **Lowerlid Strength** pour les paupières inférieures.
+3. Cliquez sur **Reset Shapes** pour remettre toutes les shape keys à 0.
+
+</TabItem>
+</Tabs>
+
+Cliquez sur **Stop Eye Testing** quand vous avez terminé : les os redeviennent visibles, la pose de test est effacée et vous revenez en mode Object. **Reset Eye Tracking Panel** ramène le panneau en mode création. Dans le jeu ou le moteur, pensez à désigner `LeftEye` et `RightEye` comme os des yeux.
+
+### Dépannage
+
+Le panneau affiche une courte liste de vérifications qui couvre la plupart des échecs :
+
+- Le maillage a des groupes de sommets pour les yeux, avec les noms listés plus haut.
+- Les shape keys sont correctement nommées et sélectionnées dans les champs.
+- Les os des yeux ont réellement des poids sur les yeux. En mode Pose, les faire pivoter doit bouger les yeux.
+- L'armature est en position de repos.
+
+Si **Set Range** indique qu'un os n'a pas de groupe de sommets ou aucun sommet assigné, vous avez choisi le mauvais maillage ou le mauvais os, ou les maillages n'ont pas été joints avant de créer le suivi oculaire.

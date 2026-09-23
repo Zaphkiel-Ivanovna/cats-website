@@ -1,0 +1,70 @@
+---
+title: Guida rapida
+description: Porta un modello dall'importazione a un FBX pronto per VRChat con Cats, passo dopo passo, e scopri quali passaggi saltare per i modelli già fatti per Unity.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Questa guida accompagna un modello in Cats dall'importazione fino a un FBX da trascinare in Unity. Presuppone che Cats sia [installato](../install/) e che la scheda CATS sia aperta nella barra laterale della 3D Viewport (<kbd>N</kbd>).
+
+<Shot
+	name="hero"
+	alt="Blender 5.1 con un avatar VRoid nella viewport e i pannelli Quick Access e MMD Options aperti nella scheda CATS."
+	caption="La scheda CATS nella barra laterale della 3D Viewport, qui con Quick Access e MMD Options aperti."
+/>
+
+## Che tipo di modello hai?
+
+Il percorso dipende dalla provenienza del modello:
+
+<Tabs>
+<TabItem label="Importazione grezza (MMD, VRM...)">
+
+Un modello preso direttamente da MMD, VRM, XNALara o da un gioco, con le ossa e la fisica originali. Ha bisogno del trattamento completo, incluso **Fix MMD Model**.
+
+</TabItem>
+<TabItem label="Fatto per Unity (Booth, Gumroad...)">
+
+Un avatar già riggato per Unity e VRChat. **Non usare Fix MMD Model su questo modello**: rinominerebbe ed eliminerebbe ossa da cui l'avatar dipende. Salta il passo 2 e usa Cats per ottimizzazione, visemi ed esportazione.
+
+</TabItem>
+</Tabs>
+
+## Dall'importazione all'esportazione
+
+<Steps>
+
+1. **Importa il modello.** In [Quick Access](../../tools/quick-access/), clicca **Import Model** e scegli il file: `.pmx`, `.vrm`, `.fbx`, `.xps`, un `.zip` e così via. Importa sempre tramite Cats: Fix MMD Model si aspetta il risultato del suo importer.
+
+2. **Correggilo (solo importazioni grezze).** Apri [MMD Options](../../tools/mmd-options/) e clicca **Fix MMD Model**. Cats traduce e rinomina le ossa secondo uno scheletro standard, unisce le ossa di supporto, unisce le mesh, pulisce le shape key e rimuove la fisica MMD. Controlla il risultato in modalità Pose (passo 6).
+
+3. **Traduci ciò che resta.** Se materiali, oggetti o shape key hanno ancora nomi giapponesi, clicca **All** sotto **Translate** in [Other Options](../../tools/other-options/).
+
+4. **Ottimizza.** In [Optimization](../../tools/optimization/):
+   - Clicca **Combine Same Materials** per unire i materiali identici.
+   - Se restano più di quattro materiali, crea un atlas con Material Combiner in **Atlas Generation**.
+   - Assicurati che il modello sia una sola mesh, o al massimo due: **Join Meshes > All**.
+   - Riduci le ossa di fisica con **Merge Bones** se hai molte catene di capelli o gonna.
+
+5. **Aggiungi il lip sync.** In [Visemes](../../tools/visemes/), scegli tre forme della bocca e clicca **Create Visemes** per ottenere le quindici shape key `vrc.v_*`.
+
+6. **Controlla come si muove.** In [Quick Access](../../tools/quick-access/#modalità-pose), clicca **Start Pose Mode** e ruota qualche osso: braccia, gambe, testa, dita. Clicca **Stop Pose Mode** quando hai finito.
+
+7. **Prepara gli occhi.** Per VRChat, apri [Eye Tracking](../../tools/eye-tracking/), scegli entrambe le ossa degli occhi sotto **SDK3 Eye Tracking** e clicca **Rotate eye bones**. Il resto dell'eye tracking si configura in Unity.
+
+8. **Esporta.** In [Quick Access](../../tools/quick-access/#export-model), clicca **Export Model**, poi di nuovo **Export Model** nel popup. Leggi gli avvisi che Cats mostra su poligoni, materiali o mesh: ognuno ti dice di cosa si lamenterà VRChat. Salva l'FBX.
+
+</Steps>
+
+## In Unity
+
+Trascina l'FBX nel tuo progetto Unity, imposta il rig su **Humanoid** nelle impostazioni di importazione e aggiungi l'avatar descriptor di VRChat. Dato che Cats ha nominato ossa e shape key come se li aspettano Unity e l'SDK di VRChat, la mappatura humanoid e il rilevamento automatico dei visemi dovrebbero compilarsi da soli.
+
+<Aside type="tip">
+	Conserva il file `.blend`. Se in seguito devi cambiare qualcosa, è molto più facile correggerlo lì
+	ed esportare di nuovo che rifare tutta la catena dal modello originale.
+</Aside>
+
+Qualcosa è andato storto? Consulta [Risoluzione dei problemi](../troubleshooting/).

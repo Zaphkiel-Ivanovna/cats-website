@@ -1,0 +1,116 @@
+---
+title: MMD Options
+description: Fix MMD Model zamienia surowy import MMD lub VRM w czysty, standardowy humanoidalny rig. Ta strona opisuje, co zmienia, jakie ma ustawienia i kiedy go nie używać.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**MMD Options** zawiera narzędzia do modeli prosto z importera: **Fix MMD Model**, jego ustawienia i przycisk usuwający bryły sztywne i przeguby. Panel jest domyślnie zwinięty.
+
+<Shot
+	name="panel-mmd-options"
+	alt="Panel MMD Options: ramka z ostrzeżeniem, przycisk Fix MMD Model z przyciskiem ustawień oraz przycisk Remove Rigidbodies and Joints."
+/>
+
+<Aside type="danger" title="Tylko dla świeżych importów">
+	Używaj tych narzędzi wyłącznie na nowo zaimportowanych modelach MMD i VRM. Nigdy nie uruchamiaj
+	ich na awatarze już przygotowanym dla Unity i VRChat, na przykład na modelu kupionym na Booth lub
+	Gumroad: zmieniają nazwy kości, scalają je i usuwają, co zepsuje awatara. Cats prosi o
+	potwierdzenie przed rozpoczęciem.
+</Aside>
+
+## Fix MMD Model
+
+Fix MMD Model to główna operacja Cats. Bierze kości, siatki i shape keys utworzone przez importer i zamienia je w standardowy humanoidalny rig rozpoznawany przez Unity. Dawniej był to przycisk **Fix Model** na górze karty CATS; ten przycisk przeniesiono tutaj.
+
+### Przed uruchomieniem
+
+- Zaimportuj model przez **Import Model** w [Quick Access](../quick-access/). Rozszerzenie ostrzega, że modele wczytane w inny sposób mogą spowodować awarię Blendera podczas naprawy.
+- Pozostaw siatki podpięte do szkieletu. Jeśli nie są, Cats przerywa z komunikatem **No mesh inside the armature found!**
+- Upewnij się, że żadna siatka nie współdzieli danych z innym obiektem. W przeciwnym razie Cats przerywa i prosi o wcześniejsze uruchomienie **Object > Relations > Make Single User**.
+- Szkielety Rigify i metarig nie są obsługiwane. Zamiast tego użyj narzędzia Rigify-to-Unity.
+
+### Uruchamianie
+
+<Steps>
+
+1. Otwórz **MMD Options**. Jeśli chcesz zmienić działanie naprawy, kliknij mały przycisk ustawień obok **Fix MMD Model** i dostosuj opcje opisane poniżej.
+
+2. Kliknij **Fix MMD Model**, przeczytaj potwierdzenie i kliknij **OK**.
+
+3. Poczekaj na **Model successfully fixed.** W przypadku dużego modelu trwa to kilka sekund.
+
+</Steps>
+
+Jeśli nie udało się znaleźć niektórych głównych kości, Cats wyświetla na końcu listę zatytułowaną **The following bones were not found:**. Naprawa i tak się kończy, ale model prawdopodobnie będzie wymagał ręcznej pracy w tych miejscach.
+
+### Co zmienia
+
+Fix MMD Model kolejno:
+
+1. **Sprawdza model** i ostrzega o zablokowanych transformacjach, siatkach bez grup wierzchołków, uszkodzonych współrzędnych UV oraz brakujących biodrach, kręgosłupie, szyi lub głowie.
+2. **Zamienia morfy kości MMD w shape keys**, aby mimika oparta na kościach przetrwała w Unity.
+3. **Porządkuje scenę**: usuwa bryły sztywne i przeguby, potomne obiekty szkieletu niebędące siatkami, obiekt Empty główny MMD oraz domyślny sześcian, kamerę i światło Blendera. Usuwa też fizykę i siatki LOD z Source Engine.
+4. **Łączy siatki** w jedną, jeśli **Join Meshes** jest włączone, i stosuje wszystkie transformacje.
+5. **Porządkuje shape keys**: usuwa klucze identyczne z Basis i klucze zaczynające się od `mmd_`, a następnie sortuje je tak, aby klucze `vrc.*` znalazły się tuż po Basis.
+6. **Tłumaczy nazwy kości** na angielski, najpierw za pomocą wbudowanego słownika, a resztę przez Google Translate.
+7. **Przemianowuje kości na standardowy szkielet**: Hips, Spine, Chest, Upper Chest, Neck, Head, barki, ramiona, łokcie, nadgarstki, nogi, kolana, kostki, palce stóp, oczy i palce dłoni. Zna setki aliasów z MMD, Mixamo, Source Engine, DAZ i innych riggów.
+8. **Odbudowuje hierarchię**: Hips staje się korzeniem, kręgosłup jest odbudowywany jako Spine, Chest i (jeśli zachowany) Upper Chest, w razie braku dodawana jest Neck, a biodra są przenoszone między nogi.
+9. **Scala wagi**: wagi kości pomocniczych MMD (Center, Groove, Waist, kości IK i atrapy, dodatkowe kości kręgosłupa i skrętu) są dodawane do pozostającej kości, a następnie kości pomocnicze są usuwane.
+10. **Usuwa wszystkie ograniczenia kości**, umieszcza wszystkie kości w jednej kolekcji `Bones` i resetuje pozę.
+11. **Sprząta**: usuwa kości o zerowej wadze i łączy łańcuchy kości, jeśli te opcje są włączone, zmienia nazwę obiektu szkieletu na `Armature` i odwraca model, jeśli został zaimportowany do góry nogami.
+
+Ustawia też zakres przycinania widoku, włącza backface culling i przełącza view transform sceny na **Standard**, aby obraz bardziej odpowiadał temu, co widać w Unity.
+
+<Shot
+	name="bones-compare"
+	alt="Ten sam awatar VRoid dwukrotnie. Po lewej jego kości nazywają się J_Bip_C_Hips, J_Bip_C_Spine, J_Bip_L_UpperArm, po prawej te same kości to Hips, Spine, Left arm."
+	caption="Kręgosłup i lewa strona szkieletu VRoid po imporcie (po lewej) i po Fix MMD Model (po prawej)."
+/>
+
+Kilka aliasów rozpoznawanych przez Cats, z list kości dodatku:
+
+| Staje się | Występuje w importach                                       |
+| --------- | ----------------------------------------------------------- |
+| `Hips`    | `Mixamorig_Hips`, `Bip_Pelvis`, `LowerBody`, `B_C_Pelvis`   |
+| `Spine`   | `Mixamorig_Spine`, `UpperBody`, `Upper_Waist`, `UpperBody2` |
+| `Head`    | `Mixamorig_Head`, `Bip_Head`, `J_Bip_C_Head`, `B_C_Head`    |
+
+<Aside title="Kości skrętu">
+	`HandTwist_L/R` i `ArmTwist_L/R` otrzymują prefiks `z` (`zHandTwist_L`), a część ich wagi trafia
+	do łokcia lub ramienia. Dzieje się tak przy każdym uruchomieniu, niezależnie od opcji dotyczących
+	kości skrętu.
+</Aside>
+
+### Fix Model Settings
+
+Przycisk ustawień obok **Fix MMD Model** otwiera to okno. Zmiany obowiązują od razu po zaznaczeniu pola; **OK** jedynie je zamyka.
+
+| Ustawienie                        | Domyślnie | Działanie                                                                                                                                                                                                                                   |
+| --------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Keep End Bones**                | Wyłączone | Chroni ostatnią kość każdego łańcucha przed usunięciem jako kość o zerowej wadze. Pomaga w spódnicach z kośćmi fizyki i może naprawić pogniecione kości palców w Unity. Działa tylko wtedy, gdy **Remove Zero Weight Bones** jest włączone. |
+| **Keep Upper Chest**              | Włączone  | Zachowuje kość Upper Chest, którą obsługuje VRChat. Wyłącz tylko dla starszego systemu SDK2: Upper Chest zostanie wtedy scalona z Chest.                                                                                                    |
+| **Keep Twist Bones**              | Wyłączone | Zachowuje każdą kość z „Twist” w nazwie. Kości, które chcesz chronić, możesz przemianować tak, aby zawierały „Twist”.                                                                                                                       |
+| **Fix MMD Twist Bones**           | Włączone  | Zachowuje kości skrętu ramion MMD o nazwach `ArmTwist[1-3]_[L/R]` i `HandTwist[1-3]_[L/R]`, aby VRChat mógł z nich korzystać.                                                                                                               |
+| **Join Meshes**                   | Włączone  | Łączy wszystkie siatki modelu w jedną. Niemal zawsze warto zostawić tę opcję włączoną.                                                                                                                                                      |
+| **Connect Bones**                 | Włączone  | Kieruje każdą kość na jej jedyną kość potomną. Zmiana czysto wizualna: nie wpływa na działanie kości.                                                                                                                                       |
+| **Remove Zero Weight Bones**      | Włączone  | Usuwa kości, które nie poruszają żadnych wierzchołków. Główne kości humanoidalne i kości `Root_` są zawsze zachowywane. Wyłącz, jeśli znikają potrzebne kości.                                                                              |
+| **Remove Rigidbodies and Joints** | Włączone  | Usuwa obiekty fizyki MMD, z których VRChat nie korzysta.                                                                                                                                                                                    |
+
+Gdy **Remove Zero Weight Bones** jest wyłączone, okno jest wyszarzone. Pozostałe pola nadal działają.
+
+## Remove Rigidbodies and Joints
+
+Modele MMD zawierają bryły sztywne i przeguby dla własnej symulacji fizyki MMD. VRChat z nich nie korzysta. Ten przycisk usuwa każdy obiekt modelu, którego nazwa zawiera `rigidbodies` lub `joints`, i zgłasza **Removed rigidbodies and joints.** Fix MMD Model robi to już sam, gdy odpowiednie ustawienie jest włączone.
+
+<Aside type="note">
+	Niezależnie od tego globalne ustawienie w [Settings & Updates](../settings/), **Remove Rigidbodies
+	and Joints Global**, usuwa każdą kolekcję o nazwie w rodzaju „rigidbody” przy użyciu większości
+	przycisków Cats. Wyłącz je, jeśli chcesz zachować fizykę MMD.
+</Aside>
+
+## MMD Options Wiki
+
+Ostatni przycisk otwiera stronę wiki projektu upstream poświęconą tym opcjom.

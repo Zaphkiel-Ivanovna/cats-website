@@ -1,0 +1,167 @@
+---
+import { Icon } from 'astro-icon/components';
+import DownloadMenu from './DownloadMenu.astro';
+import { fill } from './fill';
+
+type Step = { title: string; body: string };
+interface Props {
+	t: { title: string; download: Step; disk: Step; tab: Step; note: string };
+	vars: Record<string, string>;
+	downloadUrl: string;
+	downloadLabel: string;
+	lang: string;
+	releases: { toggle: string; title: string; latest: string; prerelease: string; all: string };
+}
+
+const { t, vars, downloadUrl, downloadLabel, lang, releases } = Astro.props;
+
+const menuPath = ['Edit', 'Preferences', 'Get Extensions', null, 'Install from Disk'];
+---
+
+<section class="block install" id="install">
+	<h2>{t.title}</h2>
+	<ol>
+		<li>
+			<h3>{t.download.title}</h3>
+			<p>{fill(t.download.body, vars)}</p>
+			<div class="extra">
+				<DownloadMenu
+					id="versions-install"
+					href={downloadUrl}
+					label={downloadLabel}
+					{lang}
+					t={releases}
+				/>
+			</div>
+		</li>
+		<li>
+			<h3>{t.disk.title}</h3>
+			<p>{t.disk.body}</p>
+			<p class="extra path">
+				{menuPath.map((label, i) => (
+					<>
+						{i > 0 && <span class="sep">›</span>}
+						<kbd style={`--i:${i}`}>
+							{label ?? <Icon name="ph:caret-down-bold" aria-label="dropdown" />}
+						</kbd>
+					</>
+				))}
+			</p>
+		</li>
+		<li>
+			<h3>{t.tab.title}</h3>
+			<p>{t.tab.body}</p>
+			<p class="extra path">
+				<kbd style="--i:0">N</kbd>
+				<span class="sep">›</span>
+				<kbd style="--i:1">CATS</kbd>
+			</p>
+		</li>
+	</ol>
+	<p class="note">{t.note}</p>
+</section>
+
+<style>
+	.install {
+		scroll-margin-top: calc(var(--sl-nav-height) + 1rem);
+	}
+	ol {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 2rem 3rem;
+		margin: 2rem 0 0;
+		padding: 0;
+		list-style: none;
+		counter-reset: step;
+	}
+	li {
+		margin: 0;
+		padding-top: 1rem;
+		border-top: 1px solid var(--sl-color-gray-5);
+	}
+	li::before {
+		counter-increment: step;
+		content: counter(step);
+		display: block;
+		margin-bottom: 0.75rem;
+		font-family: var(--sl-font-mono);
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-accent);
+	}
+	h3 {
+		font-size: var(--sl-text-lg);
+		font-weight: 600;
+		color: var(--sl-color-white);
+	}
+	li > p {
+		margin-top: 0.5rem;
+		font-size: var(--sl-text-sm);
+		line-height: 1.6;
+		color: var(--sl-color-gray-2);
+	}
+	.extra {
+		margin-top: 1rem;
+	}
+	.path {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.35rem;
+	}
+	kbd {
+		padding: 0.2rem 0.5rem;
+		border-radius: 6px;
+		border: 1px solid var(--sl-color-gray-5);
+		border-bottom-width: 2px;
+		background: var(--sl-color-gray-6);
+		font-family: var(--sl-font-mono);
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-white);
+	}
+	kbd :global(svg) {
+		vertical-align: -0.15em;
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.path.is-playing kbd {
+			animation: press 0.55s ease-out both;
+			animation-delay: calc(0.25s + var(--i) * 0.32s);
+		}
+	}
+	@keyframes press {
+		35% {
+			translate: 0 1px;
+			border-color: var(--sl-color-accent);
+			border-bottom-width: 1px;
+			background: var(--sl-color-accent-low);
+			color: var(--sl-color-accent-high);
+		}
+	}
+	.sep {
+		color: var(--sl-color-gray-4);
+	}
+	.note {
+		margin-top: 2rem;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-3);
+	}
+	@media (max-width: 56rem) {
+		ol {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
+
+<script>
+	const paths = document.querySelectorAll<HTMLElement>('.install .path');
+	const observer = new IntersectionObserver(
+		(entries) => {
+			for (const entry of entries) {
+				if (!entry.isIntersecting) continue;
+				entry.target.classList.add('is-playing');
+				observer.unobserve(entry.target);
+			}
+		},
+		{ threshold: 1 },
+	);
+	paths.forEach((path) => observer.observe(path));
+</script>

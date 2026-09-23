@@ -1,0 +1,70 @@
+---
+title: Guía rápida
+description: Lleva un modelo desde la importación hasta un FBX listo para VRChat con Cats, paso a paso, y descubre qué pasos saltarte con modelos ya hechos para Unity.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Esta guía lleva un modelo por Cats desde la importación hasta un FBX que puedes arrastrar a Unity. Da por hecho que Cats está [instalado](../install/) y que la pestaña CATS está abierta en la barra lateral del 3D Viewport (<kbd>N</kbd>).
+
+<Shot
+	name="hero"
+	alt="Blender 5.1 con un avatar de VRoid en el viewport y los paneles Quick Access y MMD Options abiertos en la pestaña CATS."
+	caption="La pestaña CATS en la barra lateral del 3D Viewport, aquí con Quick Access y MMD Options abiertos."
+/>
+
+## ¿Qué tipo de modelo tienes?
+
+El camino depende de dónde venga el modelo:
+
+<Tabs>
+<TabItem label="Importación en bruto (MMD, VRM...)">
+
+Un modelo sacado directamente de MMD, VRM, XNALara o un juego, con sus huesos y físicas originales. Necesita el tratamiento completo, incluido **Fix MMD Model**.
+
+</TabItem>
+<TabItem label="Hecho para Unity (Booth, Gumroad...)">
+
+Un avatar ya preparado para Unity y VRChat. **No ejecutes Fix MMD Model sobre él**: renombraría y borraría huesos de los que depende el avatar. Sáltate el paso 2 y usa Cats para la optimización, los visemas y la exportación.
+
+</TabItem>
+</Tabs>
+
+## De la importación a la exportación
+
+<Steps>
+
+1. **Importa el modelo.** En [Quick Access](../../tools/quick-access/), haz clic en **Import Model** y elige el archivo: `.pmx`, `.vrm`, `.fbx`, `.xps`, un `.zip`, etc. Importa siempre desde Cats: Fix MMD Model espera el resultado de su propio importador.
+
+2. **Arréglalo (solo importaciones en bruto).** Abre [MMD Options](../../tools/mmd-options/) y haz clic en **Fix MMD Model**. Cats traduce los huesos y los renombra según un esqueleto estándar, fusiona los huesos auxiliares, une las mallas, limpia las shape keys y elimina las físicas de MMD. Revisa el resultado en modo Pose (paso 6).
+
+3. **Traduce lo que quede.** Si los materiales, objetos o shape keys siguen teniendo nombres en japonés, haz clic en **All** dentro de **Translate** en [Other Options](../../tools/other-options/).
+
+4. **Optimiza.** En [Optimization](../../tools/optimization/):
+   - Haz clic en **Combine Same Materials** para fusionar los materiales idénticos.
+   - Si quedan más de cuatro materiales, crea un atlas con Material Combiner en **Atlas Generation**.
+   - Asegúrate de que el modelo sea una sola malla, o dos como mucho: **Join Meshes > All**.
+   - Reduce los huesos de físicas con **Merge Bones** si tienes muchas cadenas de pelo o falda.
+
+5. **Añade la sincronización labial.** En [Visemes](../../tools/visemes/), elige tres formas de boca y haz clic en **Create Visemes** para obtener las quince shape keys `vrc.v_*`.
+
+6. **Comprueba cómo se mueve.** En [Quick Access](../../tools/quick-access/#modo-pose), haz clic en **Start Pose Mode** y gira algunos huesos: brazos, piernas, cabeza, dedos. Haz clic en **Stop Pose Mode** cuando termines.
+
+7. **Prepara los ojos.** Para VRChat, abre [Eye Tracking](../../tools/eye-tracking/), elige los dos huesos de los ojos en **SDK3 Eye Tracking** y haz clic en **Rotate eye bones**. El resto del seguimiento ocular se configura en Unity.
+
+8. **Exporta.** En [Quick Access](../../tools/quick-access/#export-model), haz clic en **Export Model** y luego otra vez en **Export Model** en la ventana emergente. Lee cualquier aviso que muestre Cats sobre polígonos, materiales o mallas: cada uno te dice de qué se va a quejar VRChat. Guarda el FBX.
+
+</Steps>
+
+## En Unity
+
+Arrastra el FBX a tu proyecto de Unity, configura el rig como **Humanoid** en los ajustes de importación y añade el descriptor de avatar de VRChat. Como Cats ha nombrado los huesos y las shape keys como los esperan Unity y el SDK de VRChat, el mapeo humanoide y la detección automática de visemas deberían rellenarse solos.
+
+<Aside type="tip">
+	Guarda el archivo `.blend`. Si más adelante necesitas cambiar algo, es mucho más fácil arreglarlo
+	ahí y volver a exportar que repetir todo el proceso desde el modelo original.
+</Aside>
+
+¿Algo ha salido mal? Consulta [Solución de problemas](../troubleshooting/).

@@ -1,0 +1,71 @@
+---
+title: Other Options
+description: Traduci i nomi giapponesi in inglese, dividi le mesh, correggi le normali e usa una serie di strumenti extra per shape key, ossa di twist e gambe.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+**Other Options** raccoglie gli strumenti che non trovano posto altrove. Il pannello parte chiuso, e l'interruttore **Show More Options** mostra una seconda serie di strumenti.
+
+<Shot
+	name="panel-other-options"
+	alt="Il pannello Other Options con Show More Options attivo: Separate by, Translate, Normals, strumenti per shape key e ossa."
+	caption="Other Options con Show More Options attivo."
+/>
+
+## Separate by
+
+Divide la mesh attiva, oppure l'unica mesh del modello:
+
+- **Materials** crea una mesh per ogni materiale.
+- **Loose Parts** crea una mesh per ogni pezzo scollegato, per un controllo più fine.
+- **Shapes** divide la mesh in due: la parte mossa dalle shape key e il resto. Utile prima di decimare a mano, perché puoi decimare la parte statica senza toccare il viso.
+
+<Aside type="caution">
+	Non decimare mai una parte su cui potresti aver bisogno di shape key in seguito: viso, bocca,
+	occhi.
+</Aside>
+
+## Translate
+
+I modelli MMD di solito hanno nomi giapponesi. Questi pulsanti li traducono in inglese:
+
+- **All** traduce ossa, shape key, oggetti e materiali, in quest'ordine.
+- **Shape Keys**, **Objects**, **Bones** e **Materials** traducono un solo tipo di nome.
+
+Cats cerca prima i nomi nel suo dizionario integrato, poi invia il resto a Google Translate. I risultati di Google vengono salvati in cache sul tuo computer, quindi lo stesso nome viene inviato una sola volta. Ossa e shape key vengono tradotte su **tutte** le armature e le mesh del file, non solo sul modello selezionato. Le shape key che iniziano con `vrc.` non vengono mai toccate.
+
+Due opzioni cambiano il modo in cui vengono tradotte le shape key:
+
+- **Use Old Translations (not recommended)** salta il dizionario e usa solo Google, come Cats 0.9.0 e precedenti. Usala solo se hai animazioni che dipendono dai vecchi nomi.
+- **Skip Locked Shape Keys** lascia stare le shape key che hai bloccato con l'icona del lucchetto nella lista delle shape key di Blender.
+
+Se Google non è raggiungibile o ti blocca per un po', Cats applica comunque il suo dizionario e segnala che alcune parti non sono state tradotte. Riprova più tardi per il resto. Puoi svuotare la cache in [Settings & Updates](../settings/).
+
+## Show More Options
+
+### Normali
+
+- **Recalculate** fa di nuovo puntare verso l'esterno le normali della mesh attiva. Usalo quando alcune facce sembrano invertite o più scure. Non usarlo su mesh che hanno già un aspetto corretto.
+- **Flip** inverte tutte le normali, per le mesh completamente rivoltate.
+
+### Trasformazioni
+
+**Apply Transformations** applica posizione, rotazione e scala all'armatura e alle sue mesh. Il piccolo pulsante accanto le applica a tutti gli oggetti della scena.
+
+### Shape key
+
+- **Remove Unused Shapekeys** elimina le shape key della mesh attiva che non muovono alcun vertice. `vrc.v_sil` viene sempre mantenuta. La mesh deve essere selezionata, in modalità Object.
+- **Repair Broken Shapekeys** prova a riparare le shape key danneggiate da alcune operazioni di Blender.
+- **Optimize Static Shapekeys** sposta in una mesh a parte la porzione di mesh su cui agiscono le shape key, e rimuove le shape key dal resto, che viene rinominato `Static`. Così si abbassa il costo GPU dell'avatar. Unisci prima le mesh: Cats si rifiuta di funzionare su più mesh.
+- **Fix Koikatsu Shapekeys** ripara le shape key dei modelli di Koikatsu.
+
+Anche il menu delle shape key nelle proprietà Object Data di Blender riceve due voci da Cats: **Apply Selected Shapekey to Basis**, che incorpora la chiave selezionata nel Basis e conserva una copia invertita, e **Remove Unused Shapekeys**.
+
+### Ossa
+
+- **Create Digitigrade Legs** trasforma una gamba in digitigrada, per avatar dall'aspetto animale. Seleziona prima due ossa in modalità Edit; il link **How to use** apre un tutorial.
+- **Generate Twist Bones** aggiunge ossa di twist alle ossa selezionate e ne divide i pesi. **Upper Body** include anche spina dorsale e collo.
+- **Convert Bones To Valve** rinomina le ossa principali con i nomi di Source Engine. Il modello deve prima avere i nomi standard di [Fix MMD Model](../mmd-options/).

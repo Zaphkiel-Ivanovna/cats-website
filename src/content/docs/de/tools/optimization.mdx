@@ -1,0 +1,130 @@
+---
+title: Optimization
+description: Einen Textur-Atlas mit Material Combiner erstellen, identische Materialien zusammenführen, Texturen konvertieren, Meshes vereinen, doppelte Vertices entfernen und die Knochenanzahl senken.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+VRChat stuft Avatare danach ein, wie aufwendig sie zu rendern sind: vor allem nach Materialien, Meshes und Knochen. Das Panel **Optimization** hat drei Bereiche, die alle offen sind, sobald das Panel aufgeklappt wird: **Atlas Generation**, **Material Operations** und **Bone Merging**.
+
+## Atlas Generation
+
+Ein Atlas packt die Texturen mehrerer Materialien in ein einziges Bild, sodass der ganze Avatar mit einem oder zwei Materialien auskommt. Cats erstellt Atlanten nicht selbst: Es zeigt die Oberfläche von **Material Combiner**, einer separaten Erweiterung von Shotariya.
+
+<Shot
+	name="panel-optimization-atlas"
+	alt="Der Bereich Atlas Generation mit der Meldung Material Combiner is not installed und einem Button Download Material Combiner."
+	caption="Atlas Generation vor der Installation von Material Combiner."
+/>
+
+### Material Combiner einrichten
+
+Der Bereich zeigt an, in welchem Zustand sich Material Combiner befindet:
+
+| Meldung                                                                 | Vorgehen                                                                                                                      |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Material Combiner is not installed!**                                 | Auf **Download Material Combiner** klicken, das Zip von der Release-Seite als Erweiterung installieren und dann zurückkehren. |
+| **Material Combiner is not enabled!**                                   | Auf **Enable Material Combiner** klicken. Cats deaktiviert ältere Kopien und aktiviert die neueste.                           |
+| **Your Material Combiner is outdated!**                                 | Über das eigene Panel aktualisieren oder die neueste Version herunterladen. Cats benötigt Version 2.1.2.9 oder neuer.         |
+| **Your Material Combiner is out of date, please use the master branch** | Der installierten Version fehlen Teile, auf die Cats angewiesen ist. Einen neueren Build installieren.                        |
+
+Material Combiner benötigt außerdem die Bildbibliothek Pillow. Fehlt sie, zeigt der Bereich einen Button **Install Pillow**. Nach der Installation Blender neu starten.
+
+### Atlas erstellen
+
+<Steps>
+
+1. Auf **Generate Material List** klicken. Material Combiner listet alle Materialien des Modells auf.
+
+2. Die Materialien abwählen, die nicht in den Atlas sollen.
+
+3. Auf **Save Atlas to..** klicken und den Speicherort für das Atlasbild wählen. Material Combiner schreibt es und stellt das Modell darauf um.
+
+</Steps>
+
+Für Normal Maps und andere PBR-Texturen verweist der Bereich stattdessen auf das Tuxedo Blender Plugin. Der Button **?** öffnet Tipps zu Atlanten.
+
+## Material Operations
+
+<Shot
+	name="panel-optimization-materials"
+	alt="Der Bereich Material Operations: Combine Same Materials, Convert Textures to PNG, Join Meshes All und Selected sowie Remove Doubles mit seinem Schwellenwert."
+/>
+
+### Combine Same Materials
+
+Führt identische Materialien zusammen: gleiche Texturen, gleiche Farben, gleiche Shader-Werte. Die Flächen werden einem davon zugewiesen und die ungenutzten Slots entfernt. Der Avatar sollte danach genauso aussehen, mit weniger Draw Calls. Cats meldet **Combined N materials!** oder **No materials combined.**
+
+MMD-Toon- und Sphere-Texturen werden beim Vergleich ignoriert, sodass Materialien, die sich nur darin unterscheiden, ebenfalls zusammengeführt werden.
+
+### Convert Textures to PNG
+
+Wandelt jede Textur, die noch kein PNG ist, in ein PNG um, speichert es neben dem Original und verweist das Material auf die neue Datei. Das vermeidet Transparenz- und Kompatibilitätsprobleme mit Formaten wie TGA oder DDS.
+
+<Aside type="caution">
+	Dabei werden die Render-Ausgabeeinstellungen der Szene (Format, Farbtiefe, Kompression) auf PNG
+	umgestellt und so belassen. Wer später mit dieser Datei rendert, sollte sie in den
+	Output-Properties zurücksetzen.
+</Aside>
+
+### Join Meshes
+
+- **All** vereint alle der Armatur untergeordneten Meshes, genau wie **Join all meshes** in [Quick Access](../quick-access/).
+- **Selected** vereint nur die im Outliner ausgewählten Meshes.
+
+Beide wenden Transformationen an, entfernen Subdivision-Surface-Modifier, benennen die erste UV-Map in `UVMap` um, behalten einen einzigen Armature-Modifier und stellen die Reihenfolge der Shape Keys wieder her. Bleibt ein einziges Mesh übrig, erhält es den Namen `Body`.
+
+Teilt ein Mesh seine Daten mit einem anderen Objekt, verweigert Cats den Vorgang und bittet darum, zuerst **Object > Relations > Make Single User** auszuführen.
+
+### Remove Doubles
+
+Führt auf den ausgewählten Meshes, oder auf dem ersten Mesh, falls keines ausgewählt ist, Vertices zusammen, die näher als **Threshold** (Standard `0.00002`) beieinander liegen, und löscht danach lose Vertices.
+
+Hat das Mesh Shape Keys, die betroffen sein könnten, fragt Cats vor dem Fortfahren nach. Das Zusammenführen von Vertices, die von Shape Keys auseinanderbewegt werden, etwa an Augenlidern oder Lippen, kann diese Ausdrücke zerstören, daher sie anschließend prüfen.
+
+## Bone Merging
+
+Physikknochen an Haaren, Röcken und Schwänzen summieren sich schnell. Dieser Bereich reduziert sie.
+
+<Shot
+	name="panel-optimization-bones"
+	alt="Der Bereich Bone Merging: die Liste To Merge mit J_Sec_SkirtSide1 (2 bones), Merge Ratio auf 50 %, die Buttons Merge Weights, Delete und Duplicate Bones."
+/>
+
+### Merge Bones
+
+<Steps>
+
+1. Unter **Mesh** das Mesh wählen, falls das Modell mehrere hat.
+
+2. Unter **To Merge** eine Gruppe wählen. Cats listet Gruppen von Geschwisterknochen mit ähnlichen Namen auf, etwa die Strähnen eines Pferdeschwanzes, und lässt Hauptknochen des Körpers aus.
+
+3. **Merge Ratio** einstellen. Bei 50 % wird etwa jeder zweite Knochen entlang jeder Kette mit seinem Elternknochen zusammengeführt. Höhere Werte führen mehr zusammen.
+
+4. Auf **Merge Bones** klicken.
+
+</Steps>
+
+Zusammengeführte Knochen geben ihre Gewichte an ihren Elternknochen ab und werden gelöscht. Nach Änderungen an der Armatur auf **Refresh List** klicken, da die Liste zwischengespeichert wird.
+
+### Merge Weights
+
+Knochen im Edit mode oder Pose mode auswählen, dann:
+
+- **To Parents** löscht jeden ausgewählten Knochen und fügt seine Gewichte dem nächsten nicht ausgewählten Elternknochen hinzu.
+- **To Active** löscht die ausgewählten Knochen außer dem aktiven (dem zuletzt angeklickten) und überträgt alle ihre Gewichte auf ihn.
+
+**Keep Merged Bones** aktivieren, um die Knochen nach dem Übertragen ihrer Gewichte zu behalten, oder **Merge Visible Meshes Only**, um ausgeblendete Meshes unangetastet zu lassen.
+
+### Delete
+
+- **Zero Weight Bones** löscht Knochen, die keine Vertices bewegen. Humanoide Hauptknochen und `Root_`-Knochen bleiben erhalten. Mit den Optionen unter den Buttons lassen sich außerdem Twist-Knochen, leere Elternknochen gewichteter Knochen oder ausgeblendete Knochen behalten.
+- **Constraints** entfernt alle Bone Constraints. VRChat nutzt sie nicht.
+- **Zero Weight Vertex Groups** löscht Vertex-Gruppen ohne Gewichte, auf allen Meshes der Szene.
+
+### Duplizieren und verbinden
+
+- **Duplicate Bones** kopiert die ausgewählten Knochen samt Gewichten als `<name>_copy`.
+- **Connect Bones** verbindet jeden Knochen mit seinem Elternknochen und richtet ihre Ausrichtung gerade.

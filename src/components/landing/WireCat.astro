@@ -1,0 +1,161 @@
+---
+import cat from '../../data/wirecat.json';
+
+const [x, y, w, h] = cat.viewBox;
+const key = (px: number, py: number) => `${px},${py}`;
+const index = new Map(cat.vertices.map(([vx, vy], i) => [key(vx, vy), i]));
+---
+
+<svg viewBox={`${x - 6} ${y - 6} ${w + 12} ${h + 12}`} class="wirecat" aria-hidden="true">
+	<g class="edges">
+		{cat.edges.map(([x1, y1, x2, y2], i) => (
+			<path
+				d={`M${x1} ${y1}L${x2} ${y2}`}
+				pathLength="1"
+				style={`--i:${i}`}
+				data-a={index.get(key(x1, y1))}
+				data-b={index.get(key(x2, y2))}
+			/>
+		))}
+	</g>
+	<g class="vertices">
+		{cat.vertices.map(([cx, cy], i) => (
+			<circle {cx} {cy} r="2" style={`--i:${i}`} />
+		))}
+	</g>
+	<circle class="falloff" r="44" cx="-100" cy="-100"></circle>
+</svg>
+
+<style>
+	.wirecat {
+		display: block;
+		width: 100%;
+		max-width: 22rem;
+		margin-inline: auto;
+		overflow: visible;
+	}
+	.edges path {
+		--w: 0;
+		fill: none;
+		stroke: color-mix(
+			in srgb,
+			var(--sl-color-accent) calc(var(--w) * 100%),
+			var(--sl-color-gray-3)
+		);
+		stroke-width: calc(1px + var(--w) * 0.6px);
+		stroke-linecap: round;
+	}
+	.vertices circle {
+		--w: 0;
+		fill: var(--sl-color-accent);
+		transform-box: fill-box;
+		transform-origin: center;
+		scale: calc(1 + var(--w) * 1.2);
+	}
+	.falloff {
+		fill: none;
+		stroke: var(--sl-color-gray-3);
+		stroke-width: 0.6;
+		stroke-dasharray: 3 3;
+		opacity: 0;
+		transition: opacity 0.25s ease-out;
+		pointer-events: none;
+	}
+	.wirecat.is-editing .falloff {
+		opacity: 0.8;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.edges path,
+		.vertices circle {
+			transition: --w 0.18s ease-out;
+		}
+		.edges path {
+			stroke-dasharray: 1;
+			stroke-dashoffset: 1;
+			animation: draw 0.6s ease-out forwards;
+			animation-delay: calc(var(--i) * 6ms);
+		}
+		.vertices circle {
+			opacity: 0;
+			animation: appear 0.4s ease-out forwards;
+			animation-delay: calc(0.8s + var(--i) * 6ms);
+		}
+	}
+	@keyframes draw {
+		to {
+			stroke-dashoffset: 0;
+		}
+	}
+	@keyframes appear {
+		to {
+			opacity: 1;
+		}
+	}
+</style>
+
+<style is:global>
+	@property --w {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+</style>
+
+<script>
+	const RADIUS = 44;
+
+	for (const svg of document.querySelectorAll<SVGSVGElement>('svg.wirecat')) {
+		const falloff = svg.querySelector<SVGCircleElement>('.falloff')!;
+		const vertices = [...svg.querySelectorAll<SVGCircleElement>('.vertices circle')];
+		const points = vertices.map((c) => [
+			Number(c.getAttribute('cx')),
+			Number(c.getAttribute('cy')),
+		]);
+		const edges = [...svg.querySelectorAll<SVGPathElement>('.edges path')].map((path) => ({
+			path,
+			a: Number(path.dataset.a),
+			b: Number(path.dataset.b),
+		}));
+		const weights = new Float32Array(points.length);
+		let pointer: DOMPoint | null = null;
+		let frame = 0;
+
+		const paint = () => {
+			frame = 0;
+			for (let i = 0; i < points.length; i++) {
+				let weight = 0;
+				if (pointer) {
+					const d = Math.hypot(points[i][0] - pointer.x, points[i][1] - pointer.y) / RADIUS;
+					weight = d < 1 ? 1 - d * d * (3 - 2 * d) : 0;
+				}
+				if (Math.abs(weight - weights[i]) > 0.01) {
+					weights[i] = weight;
+					vertices[i].style.setProperty('--w', weight.toFixed(2));
+				}
+			}
+			for (const { path, a, b } of edges) {
+				path.style.setProperty('--w', Math.max(weights[a], weights[b]).toFixed(2));
+			}
+		};
+		const schedule = () => {
+			if (!frame) frame = requestAnimationFrame(paint);
+		};
+
+		svg.addEventListener('pointermove', (event) => {
+			if (event.pointerType !== 'mouse') return;
+			const matrix = svg.getScreenCTM();
+			if (!matrix) return;
+			pointer = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
+			falloff.setAttribute('cx', String(pointer.x));
+			falloff.setAttribute('cy', String(pointer.y));
+			svg.classList.add('is-editing');
+			schedule();
+		});
+		svg.addEventListener('pointerleave', () => {
+			pointer = null;
+			svg.classList.remove('is-editing');
+			schedule();
+		});
+	}
+</script>

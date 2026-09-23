@@ -1,0 +1,99 @@
+---
+import CompareSlider from './CompareSlider.astro';
+import { fill } from './fill';
+import before from '../../assets/screenshots/bones-before.png';
+import after from '../../assets/screenshots/bones-after.png';
+
+interface Props {
+	t: {
+		title: string;
+		body: string;
+		points: string[];
+		before: string;
+		after: string;
+		figureAlt: string;
+		figureCaption: string;
+	};
+	lang: string;
+}
+
+const { t, lang } = Astro.props;
+
+const rigs = [
+	'MMD',
+	'XNALara',
+	'Mixamo',
+	'Source Engine',
+	'Unreal Engine',
+	'DAZ/Poser',
+	'Blender Rigify',
+	'Sims 2',
+	'Motion Builder',
+	'3DS Max',
+];
+
+const rigList = new Intl.ListFormat(lang, { type: 'conjunction' }).format(rigs);
+---
+
+<section class="block fix">
+	<div>
+		<h2>{t.title}</h2>
+		<p class="intro">{fill(t.body, { rigs: rigList })}</p>
+		<ul>
+			{t.points.map((point) => (
+				<li>{point}</li>
+			))}
+		</ul>
+	</div>
+	<figure>
+		<CompareSlider {before} {after} beforeLabel={t.before} afterLabel={t.after} alt={t.figureAlt} />
+		<figcaption>{t.figureCaption}</figcaption>
+	</figure>
+</section>
+
+<style>
+	.fix > div {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		column-gap: 3rem;
+		align-items: start;
+	}
+	.fix h2,
+	.fix .intro {
+		grid-column: 1;
+	}
+	.fix ul {
+		grid-column: 2;
+		grid-row: 1 / span 2;
+	}
+	ul {
+		margin: 0.4rem 0 0;
+		padding-inline-start: 1.1rem;
+		color: var(--sl-color-gray-1);
+		line-height: 1.6;
+	}
+	li + li {
+		margin-top: 0.4rem;
+	}
+	li::marker {
+		color: var(--sl-color-accent);
+	}
+	figure {
+		margin: 2.5rem 0 0;
+	}
+	figcaption {
+		margin-top: 0.75rem;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+	}
+	@media (max-width: 50rem) {
+		.fix > div {
+			grid-template-columns: 1fr;
+		}
+		.fix ul {
+			grid-column: 1;
+			grid-row: auto;
+			margin-top: 1.5rem;
+		}
+	}
+</style>

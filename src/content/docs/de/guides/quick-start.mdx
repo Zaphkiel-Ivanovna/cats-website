@@ -1,0 +1,70 @@
+---
+title: Schnellstart
+description: Ein Modell mit Cats Schritt für Schritt vom Import zu einer VRChat-fertigen FBX bringen, und wissen, welche Schritte bei Modellen für Unity entfallen.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Diese Anleitung führt ein Modell durch Cats, vom Import bis zu einer FBX, die direkt in Unity verwendet werden kann. Vorausgesetzt wird, dass Cats [installiert](../install/) ist und der CATS-Tab in der Seitenleiste des 3D Viewport (<kbd>N</kbd>) geöffnet ist.
+
+<Shot
+	name="hero"
+	alt="Blender 5.1 mit einem VRoid-Avatar im Viewport und den geöffneten Panels Quick Access und MMD Options im CATS-Tab."
+	caption="Der CATS-Tab in der Seitenleiste des 3D Viewport, hier mit geöffnetem Quick Access und MMD Options."
+/>
+
+## Um welche Art von Modell handelt es sich?
+
+Der Weg hängt von der Herkunft des Modells ab:
+
+<Tabs>
+<TabItem label="Roher Import (MMD, VRM...)">
+
+Ein Modell direkt aus MMD, VRM, XNALara oder einem Spiel, mit seinen ursprünglichen Knochen und seiner Physik. Es braucht die volle Behandlung, einschließlich **Fix MMD Model**.
+
+</TabItem>
+<TabItem label="Für Unity erstellt (Booth, Gumroad...)">
+
+Ein Avatar, der bereits für Unity und VRChat geriggt ist. **Fix MMD Model nicht darauf anwenden**: Es würde Knochen umbenennen und löschen, auf die der Avatar angewiesen ist. Schritt 2 überspringen und Cats für Optimierung, Viseme und Export nutzen.
+
+</TabItem>
+</Tabs>
+
+## Vom Import zum Export
+
+<Steps>
+
+1. **Modell importieren.** In [Quick Access](../../tools/quick-access/) auf **Import Model** klicken und die Datei wählen: `.pmx`, `.vrm`, `.fbx`, `.xps`, ein `.zip` und so weiter. Immer über Cats importieren: Fix MMD Model erwartet das Ergebnis des eigenen Importers.
+
+2. **Reparieren (nur rohe Importe).** [MMD Options](../../tools/mmd-options/) öffnen und auf **Fix MMD Model** klicken. Cats übersetzt die Knochen und benennt sie nach einem Standardskelett um, führt Hilfsknochen zusammen, vereint die Meshes, bereinigt die Shape Keys und entfernt die MMD-Physik. Das Ergebnis im Pose mode prüfen (Schritt 6).
+
+3. **Restliche Namen übersetzen.** Wenn Materialien, Objekte oder Shape Keys noch japanische Namen haben, unter **Translate** in [Other Options](../../tools/other-options/) auf **All** klicken.
+
+4. **Optimieren.** In [Optimization](../../tools/optimization/):
+   - Auf **Combine Same Materials** klicken, um identische Materialien zusammenzuführen.
+   - Bleiben mehr als vier Materialien übrig, mit Material Combiner unter **Atlas Generation** einen Atlas erstellen.
+   - Sicherstellen, dass das Modell aus einem einzigen Mesh besteht, höchstens aus zwei: **Join Meshes > All**.
+   - Bei vielen Haar- oder Rockketten die Physikknochen mit **Merge Bones** reduzieren.
+
+5. **Lippensynchronisation hinzufügen.** In [Visemes](../../tools/visemes/) drei Mundformen wählen und auf **Create Visemes** klicken, um die fünfzehn `vrc.v_*` Shape Keys zu erhalten.
+
+6. **Bewegung prüfen.** In [Quick Access](../../tools/quick-access/#pose-mode) auf **Start Pose Mode** klicken und einige Knochen drehen: Arme, Beine, Kopf, Finger. Danach auf **Stop Pose Mode** klicken.
+
+7. **Augen vorbereiten.** Für VRChat [Eye Tracking](../../tools/eye-tracking/) öffnen, unter **SDK3 Eye Tracking** beide Augenknochen wählen und auf **Rotate eye bones** klicken. Der Rest des Eye Trackings wird in Unity eingerichtet.
+
+8. **Exportieren.** In [Quick Access](../../tools/quick-access/#export-model) auf **Export Model** klicken, dann im Popup erneut auf **Export Model**. Jede Warnung von Cats zu Polygonen, Materialien oder Meshes lesen: Jede nennt einen Punkt, den VRChat bemängeln wird. Die FBX speichern.
+
+</Steps>
+
+## In Unity
+
+Die FBX in das Unity-Projekt ziehen, in den Importeinstellungen den Rig auf **Humanoid** setzen und den VRChat Avatar Descriptor hinzufügen. Da Cats Knochen und Shape Keys so benannt hat, wie Unity und das VRChat SDK es erwarten, sollten sich das Humanoid-Mapping und die automatische Viseme-Erkennung von selbst ausfüllen.
+
+<Aside type="tip">
+	Die `.blend`-Datei aufbewahren. Spätere Änderungen lassen sich dort viel leichter vornehmen und
+	erneut exportieren, als die ganze Kette ab dem Originalmodell zu wiederholen.
+</Aside>
+
+Etwas ist schiefgelaufen? Siehe [Fehlerbehebung](../troubleshooting/).

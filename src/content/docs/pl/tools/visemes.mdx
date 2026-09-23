@@ -1,0 +1,102 @@
+---
+title: Visemes
+description: Wygeneruj piętnaście shape keys synchronizacji ust vrc.v_* odczytywanych przez VRChat z trzech kształtów ust, które model już ma.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+VRChat steruje synchronizacją ust za pomocą piętnastu shape keys o nazwach od `vrc.v_aa` do `vrc.v_th`. Większość modeli ma tylko kilka kształtów ust. Panel **Visemes** tworzy wszystkie piętnaście, mieszając trzy wybrane kształty: otwarte „aa”, zaokrąglone „oh” i zaciśnięte „ch”.
+
+Panel jest domyślnie zwinięty na karcie CATS.
+
+## Zanim zaczniesz
+
+- Siatka z shape keys ust musi być podpięta do szkieletu. Cats wyświetla tylko siatki będące dziećmi szkieletu modelu, więc luźna siatka daje komunikat **No meshes found!**.
+- Najpierw połącz siatki, aby twarz znalazła się w jednej siatce ze wszystkimi swoimi shape keys. [Fix MMD Model](../mmd-options/) robi to przy świeżych importach MMD i VRM, a **Join all meshes** w [Quick Access](../quick-access/) w dowolnym modelu.
+- Znajdź trzy shape keys, które faktycznie poruszają ustami. W modelach MMD to zwykle `あ`, `お` i `い` przed tłumaczeniem albo `A`, `O` i `I` po nim.
+
+## Tworzenie wizemów
+
+<Steps>
+
+1. Otwórz **Visemes** na karcie CATS. Jeśli model ma więcej niż jedną siatkę, wybierz tę z ustami w **Mesh**.
+
+2. Ustaw trzy kształty ust:
+
+   | Pole          | Wybierz shape key, w którym usta…                       |
+   | ------------- | ------------------------------------------------------- |
+   | **Viseme AA** | są szeroko otwarte, jak przy wymawianiu „aa”.           |
+   | **Viseme OH** | są zaokrąglone, jak przy wymawianiu „oh”.               |
+   | **Viseme CH** | mają rozchylone wargi i zaciśnięte zęby, jak przy „ch”. |
+
+   Cats wstępnie wypełnia te pola popularnymi nazwami, takimi jak `MTH A`, `Ah` czy `A`. Sprawdź każde z nich: wstępnie wpisana nazwa to tylko przypuszczenie i może wskazywać klucz, którego siatka nie ma.
+
+3. Za pierwszym razem zostaw **Shape Key Mix Intensity** na `1.0`. Zmniejsz wartość, jeśli usta otwierają się za szeroko, zwiększ, jeśli synchronizacja ust wygląda słabo. Zakres wynosi od 0 do 10.
+
+4. Kliknij **Preview Visemes** i przejdź przez dźwięki na liście rozwijanej, aby zobaczyć każdą mieszankę na modelu. Kliknij **Stop Preview**, aby przywrócić shape keys do poprzedniego stanu.
+
+5. Kliknij **Create Visemes**. Po zakończeniu Cats zgłasza **Created mouth visemes!**
+
+</Steps>
+
+<Shot
+	name="panel-visemes"
+	alt="Panel Visemes z Viseme AA, OH i CH ustawionymi na Fcl_MTH_A, Fcl_MTH_O i Fcl_MTH_I, Shape Key Mix Intensity na 1.00 i przyciskiem Create Visemes."
+	caption="Trzy kształty ust modelu VRoid wybrane w panelu."
+/>
+
+<Aside type="caution" title="Nigdy nie wybieraj Basis">
+	Basis to kształt neutralny i nie porusza ustami. Cats odmawia działania z komunikatem **Please
+	select the correct mouth shapekeys instead of "Basis"!**
+</Aside>
+
+## Jak mieszany jest każdy wizem
+
+Każdy klucz wynikowy jest mieszanką trzech wybranych kształtów. Poniższe wagi są mnożone przez **Shape Key Mix Intensity**.
+
+<Shot
+	name="visemes-faces"
+	alt="Ta sama twarz trzy razy: z szeroko otwartymi ustami, z zaokrąglonymi ustami i z rozchylonymi wargami nad zaciśniętymi zębami."
+	caption="vrc.v_aa, vrc.v_oh i vrc.v_ch wygenerowane z twarzy VRoid."
+/>
+
+| Shape key   | AA      | OH      | CH      |
+| ----------- | ------- | ------- | ------- |
+| `vrc.v_aa`  | 1       |         |         |
+| `vrc.v_ch`  |         |         | 1       |
+| `vrc.v_dd`  | 0.3     |         | 0.7     |
+| `vrc.v_e`   | 0.5     |         | 0.2     |
+| `vrc.v_ff`  | 0.2     |         | 0.4     |
+| `vrc.v_ih`  |         | 0.3     | 0.7     |
+| `vrc.v_kk`  | 0.7     |         | 0.4     |
+| `vrc.v_nn`  | 0.2     |         | 0.7     |
+| `vrc.v_oh`  | 0.2     | 0.8     |         |
+| `vrc.v_ou`  |         | 1       |         |
+| `vrc.v_pp`  | minimal | minimal |         |
+| `vrc.v_rr`  |         | 0.3     | 0.5     |
+| `vrc.v_sil` | minimal |         | minimal |
+| `vrc.v_ss`  |         |         | 0.8     |
+| `vrc.v_th`  | 0.4     | 0.15    |         |
+
+`vrc.v_pp` i `vrc.v_sil` to niemal zamknięte usta. Cats nadaje im bardzo małą wagę, aby żadne dwa klucze nie były dokładnie identyczne.
+
+## Co jeszcze się zmienia
+
+Tworzenie wizemów to coś więcej niż dodanie piętnastu kluczy. Spodziewaj się następujących skutków ubocznych:
+
+- Istniejący klucz o tej samej nazwie, na przykład stary `vrc.v_aa`, jest usuwany i tworzony od nowa.
+- Shape keys są sortowane: najpierw Basis, potem klucze `vrc.blink_*` i `vrc.lowerlid_*` z [Eye Tracking](../eye-tracking/), a następnie wizemy.
+- Obiekt szkieletu otrzymuje nazwę `Armature`, a obiekt Empty będący rodzicem szkieletu jest usuwany.
+- Na czas działania wszystkie obiekty są odkrywane i przełączane w tryb Object.
+
+## Gdy coś wygląda źle
+
+- **Usta się rozrywają lub rozciągają.** Zmniejsz **Shape Key Mix Intensity** i utwórz wizemy ponownie. Cats może też ostrzec, że wizem mocno deformuje siatkę, gdy wierzchołek przesuwa się o 40% lub więcej rozmiaru siatki.
+- **Ponowne uruchomienie niczego nie zmienia.** Cats pamięta mieszanki utworzone w bieżącej sesji Blendera. Jeśli ponownie tworzysz wizemy z tych samych trzech kluczy źródłowych, część z nich może zostać pominięta. Przed wypróbowaniem innej intensywności uruchom Blendera ponownie.
+- **Panel wyświetla `VisemePanel.error.noShapekeys`.** Ten surowy tekst oznacza, że wybrana siatka nie ma żadnych shape keys. Wybierz siatkę zawierającą twarz.
+
+## Dalej
+
+W Unity otwórz deskryptor awatara, ustaw **Lip Sync** na **Viseme Blend Shape** i wybierz siatkę. Ponieważ klucze mają nazwy `vrc.v_*`, automatyczne wykrywanie SDK samo wypełni wszystkie sloty wizemów.

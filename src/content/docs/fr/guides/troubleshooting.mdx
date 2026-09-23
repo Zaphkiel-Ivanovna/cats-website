@@ -1,0 +1,100 @@
+---
+title: Dépannage
+description: Ce que signifient les messages d'erreur les plus courants de Cats et comment les résoudre.
+sourceUpdated: 2026-09-23
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Cats affiche ses erreurs dans une fenêtre intitulée **Report: Error**, ou dans la barre d'état de Blender. Voici celles que l'on rencontre le plus souvent, avec leur solution.
+
+## Erreurs de modèle et de maillage
+
+<details>
+<summary>No meshes found!</summary>
+
+Cats ne compte que les maillages **parentés à l'armature**. Un maillage placé à côté de l'armature dans l'Outliner, mais pas sous elle, est ignoré. Sélectionnez le maillage, puis l'armature, appuyez sur <kbd>Ctrl</kbd> + <kbd>P</kbd> et choisissez **With Empty Groups** ou **Object**, selon qu'il a déjà des poids ou non.
+
+Fix MMD Model dit la même chose à sa manière : **No mesh inside the armature found!**
+
+</details>
+
+<details>
+<summary>Your Objects/ Meshes are not Single User</summary>
+
+Deux objets partagent les mêmes données de maillage ou d'armature, généralement après une duplication avec <kbd>Alt</kbd> + <kbd>D</kbd>. Sélectionnez tous les objets, lancez **Object > Relations > Make Single User > Object & Data**, puis réessayez.
+
+</details>
+
+<details>
+<summary>Rigify and Metarig armatures are not supported</summary>
+
+Fix MMD Model refuse les rigs créés avec Rigify, repérés par le nom `metarig` ou par des os commençant par `DEF-`, `MCH-` ou `ORG-`. Utilisez plutôt une extension Rigify-to-Unity pour convertir le rig. Si votre rig n'est pas un rig Rigify, renommez les os et l'armature pour qu'ils n'utilisent pas ces noms.
+
+</details>
+
+<details>
+<summary>The following bones were not found</summary>
+
+Affiché à la fin de Fix MMD Model quand certains os principaux, comme une jambe ou le cou, n'ont pas pu être identifiés. La réparation va tout de même jusqu'au bout. Renommez à la main les os manquants avec les noms standard (`Left leg`, `Neck`, etc.) et vérifiez la hiérarchie. Si le modèle n'a pas été modifié, le projet en amont accueille volontiers les signalements pour pouvoir le prendre en charge.
+
+</details>
+
+## Erreurs d'import
+
+<details>
+<summary>XPS Tools / Source Tools / VRM Importer is not installed or enabled!</summary>
+
+Cats s'appuie sur des extensions séparées pour ces formats. Cliquez sur le bouton de téléchargement dans la fenêtre, installez l'extension dans **Edit > Preferences > Add-ons**, activez-la et relancez l'import.
+
+</details>
+
+<details>
+<summary>The FBX file version is unsupported!</summary>
+
+Le FBX est trop ancien pour l'importeur de Blender. Convertissez-le vers une version FBX plus récente avec un outil comme Autodesk FBX Converter.
+
+</details>
+
+## Erreurs de traduction
+
+<details>
+<summary>Could not connect to Google / banned from Google Translate temporarily</summary>
+
+Cats a traduit ce qu'il pouvait avec son dictionnaire intégré, mais Google a refusé le reste, souvent après de nombreuses requêtes à la suite. Patientez un moment et cliquez à nouveau sur **Translate** : seuls les noms manquants sont envoyés. Vérifiez que Blender est autorisé à accéder à Internet.
+
+</details>
+
+## Avertissements d'export
+
+Les avertissements que Cats affiche avant l'export sont des conseils, pas des erreurs : vous pouvez cliquer sur **Continue to Export**. Ils correspondent aux critères de VRChat pour classer les performances des avatars. Consultez le tableau dans [Export Model](../../tools/quick-access/#vérifications-avant-export).
+
+**Broken shapekeys!** fait exception : VRChat refuse de mettre en ligne un avatar avec ces shape keys. Supprimez-les, ou essayez **Repair Broken Shapekeys** dans [Other Options](../../tools/other-options/).
+
+## Suivi oculaire et visèmes
+
+<details>
+<summary>Eye tracking will not work unless the bone hierarchy is exactly as following</summary>
+
+Suivi oculaire legacy : la chaîne doit être Hips > Spine > Chest > Neck > Head, l'armature nommée `Armature` et le maillage des yeux `Body`.
+
+</details>
+
+<details>
+<summary>Please select the correct mouth shapekeys instead of "Basis"!</summary>
+
+Visèmes : choisissez des shape keys qui ouvrent réellement la bouche.
+
+</details>
+
+## Messages qui ressemblent à du code
+
+Certains messages s'affichent sous forme de clés brutes, comme `VisemePanel.error.noShapekeys` ou `RemoveDoubles.error.failed`. Cela signifie que le texte anglais manque dans le fichier de traduction de l'extension. La clé indique généralement ce qui s'est passé : ici, le maillage n'a pas de shape keys, ou la suppression des doublons a échoué.
+
+<Aside type="tip">
+	Toujours bloqué ? Ouvrez une issue sur
+	[GitHub](https://github.com/Zaphkiel-Ivanovna/cats-blender-plugin-unofficial/issues) en indiquant
+	votre version de Blender, le message et ce sur quoi vous avez cliqué. Pour les problèmes qui ne
+	sont pas propres à Blender 5.x, le [projet en
+	amont](https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-/issues) est plus indiqué.
+</Aside>

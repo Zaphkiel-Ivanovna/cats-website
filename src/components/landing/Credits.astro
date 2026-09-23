@@ -1,0 +1,101 @@
+---
+interface Props {
+	t: {
+		title: string;
+		body: string;
+		source: string;
+		lineage: { origin: string; upstream: string; fork: string };
+	};
+	repoUrl: string;
+}
+
+const { t, repoUrl } = Astro.props;
+
+const lineage = [
+	{
+		repo: 'absolute-quantum/cats-blender-plugin',
+		href: 'https://github.com/absolute-quantum/cats-blender-plugin',
+		license: 'MIT',
+		text: t.lineage.origin,
+	},
+	{
+		repo: 'teamneoneko/Cats-Blender-Plugin-Unofficial-',
+		href: 'https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-',
+		license: 'GPL-3.0',
+		text: t.lineage.upstream,
+	},
+	{
+		repo: 'Zaphkiel-Ivanovna/cats-blender-plugin-unofficial',
+		href: repoUrl,
+		license: 'GPL-3.0-or-later',
+		text: t.lineage.fork,
+	},
+];
+---
+
+<section class="block">
+	<h2>{t.title}</h2>
+	<p class="intro">{t.body}</p>
+	<ol>
+		{lineage.map((node) => (
+			<li>
+				<a href={node.href}>{node.repo}</a>
+				<p>{node.text}</p>
+				<span class="license">{node.license}</span>
+			</li>
+		))}
+	</ol>
+	<p class="source">
+		<a href={repoUrl}>{t.source}</a>
+	</p>
+</section>
+
+<style>
+	ol {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 2rem;
+		margin: 2rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+	li {
+		margin: 0;
+	}
+	a {
+		font-family: var(--sl-font-mono);
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-white);
+		overflow-wrap: anywhere;
+		text-underline-offset: 3px;
+	}
+	a:hover {
+		color: var(--sl-color-accent);
+	}
+	li p {
+		margin-top: 0.5rem;
+		font-size: var(--sl-text-sm);
+		line-height: 1.55;
+		color: var(--sl-color-gray-2);
+	}
+	.license {
+		display: block;
+		margin-top: 0.4rem;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+	}
+	.source {
+		margin-top: 2.5rem;
+	}
+	.source a {
+		font-family: var(--sl-font);
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-accent);
+	}
+	@media (max-width: 44rem) {
+		ol {
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+		}
+	}
+</style>

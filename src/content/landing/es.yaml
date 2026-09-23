@@ -1,0 +1,83 @@
+hero:
+  title: Prepara tus modelos importados para VRChat.
+  lead: Cats toma el modelo que un importador acaba de dejar en Blender, renombra sus huesos, fusiona sus pesos, une sus mallas y limpia lo que sobra.
+  download: Descargar la {version}
+  docs: Leer la guía
+  meta: Para Blender {series}. Gratis, bajo la GPL.
+  shotAlt: 'Blender 5.1 con un avatar de VRoid en el viewport y los paneles Quick Access y MMD Options de la pestaña CATS abiertos en la barra lateral.'
+  shotCaption: 'Cats en Blender 5.1, sobre el avatar de ejemplo CC0 de VRoid después de Fix MMD Model.'
+
+releases:
+  toggle: 'Elegir una versión'
+  title: 'Todas las versiones'
+  latest: 'Última'
+  prerelease: 'Prelanzamiento'
+  all: 'Todas las versiones en GitHub'
+
+fixModel:
+  title: Fix MMD Model hace el trabajo pesado
+  body: Ejecútalo una vez, justo después de importar un modelo MMD o VRM. Sus listas de huesos también cubren esqueletos de {rigs}. No lo uses en avatares ya preparados para Unity, como los de Booth o Gumroad.
+  points:
+    - Traduce los nombres de los huesos y los renombra según un esqueleto estándar.
+    - Pasa los pesos de los huesos auxiliares a los huesos que se quedan y luego los elimina.
+    - Reconstruye la cadena Hips, Spine, Chest y Neck.
+    - Une las mallas y elimina las shape keys que no hacen nada.
+    - Quita los rigid bodies, los joints y otros restos de MMD.
+  before: 'Importado'
+  after: 'Después de Fix MMD Model'
+  figureAlt: 'El mismo avatar dos veces. A la izquierda sus huesos tienen nombres de VRoid como J_Bip_C_Hips y J_Bip_L_UpperArm; a la derecha los mismos huesos se llaman Hips, Left arm y Left knee.'
+  figureCaption: 'La columna y el lado izquierdo del rig, antes y después. El lado derecho se renombra igual.'
+
+panels:
+  title: Todo lo que hay en la pestaña CATS
+  body: Cada panel tiene su propia página en la guía, en el orden en que Blender los muestra.
+  items:
+    quickAccess: Importar y exportar modelos, combinar materiales, unir mallas y probar poses.
+    optimization: Atlas de materiales, combinación de materiales, unión de mallas y fusión de huesos.
+    customModel: Fusionar dos armaduras o añadir una malla a un hueso.
+    mmdOptions: Fix MMD Model y las demás herramientas para importaciones MMD y VRM recién hechas.
+    otherOptions: Traducción, separación de mallas, normales y más herramientas de shape keys.
+    visemes: Crea las quince shape keys vrc.v_* a partir de tres formas de boca.
+    boneParenting: Agrupa huesos parecidos bajo un nuevo hueso raíz, para huesos de física.
+    modelScaling: Cambia el tamaño del avatar con el add-on Immersive Scaler.
+    eyeTracking: Orienta los huesos de los ojos para el SDK3 de VRChat, además del sistema antiguo para otros juegos.
+    settings: Ajustes de exportación y traducción, idioma de la interfaz y actualizaciones.
+
+fork:
+  title: Qué ha cambiado en este fork
+  body: Este fork existe para el trabajo en Blender 5.x y sigue al upstream en todo lo demás.
+  timing: Fix Model en un avatar de 323 huesos, 14 mallas y 124k vértices, con el mismo resultado.
+  before: antes
+  after: ahora
+  items:
+    - title: La búsqueda de actualizaciones funciona.
+      body: La comparación de versiones quitaba la serie de Blender solo de un lado, así que nunca se ofrecía ninguna actualización.
+    - title: Las actualizaciones se instalan con Blender.
+      body: El actualizador entrega el paquete al instalador de extensiones de Blender en lugar de borrar sus propios archivos.
+    - title: Los slots de material mantienen su orden.
+      body: La malla unida conserva el mismo orden de slots en cada ejecución, así que llega a Unity siempre igual.
+    - title: Los certificados TLS se vuelven a verificar.
+      body: El actualizador ya no desactiva la verificación de certificados para toda la sesión y el resto de add-ons.
+  more: Otros treinta arreglos están en el historial de git.
+
+install:
+  title: Instálalo como extensión
+  download:
+    title: Descarga el zip
+    body: Consigue {file} en la última versión publicada.
+  disk:
+    title: Install from Disk
+    body: Abre las preferencias de extensiones y luego el desplegable de arriba a la derecha.
+  tab:
+    title: Abre la pestaña CATS
+    body: Pulsa N en el 3D Viewport. Cats está en la barra lateral, en su propia pestaña.
+  note: Blender solo ofrece Cats a las versiones compatibles, y el add-on no se carga en ninguna otra.
+
+credits:
+  title: De dónde viene Cats
+  body: El conjunto está bajo GPL-3.0-or-later. Los archivos con cabecera MIT vienen del proyecto original y la conservan.
+  source: Código fuente
+  lineage:
+    origin: El original, de Hotox y GiveMeAllYourCats.
+    upstream: Continuado por el Neoneko Team, con una línea de versiones por serie de Blender.
+    fork: La línea para Blender 5.x, mantenida por Zaphkiel-Ivanovna.

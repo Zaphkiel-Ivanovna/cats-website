@@ -1,0 +1,36 @@
+---
+title: Model Scaling
+description: Cambia el tamaño de un avatar y ajusta sus proporciones con la extensión Immersive Scaler, que se muestra en el panel Model Scaling.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**Model Scaling** no escala el modelo por sí mismo. Muestra la interfaz de **Immersive Scaler**, una extensión aparte pensada para ajustar los avatares a una altura concreta y corregir sus proporciones para la realidad virtual.
+
+## Instalar Immersive Scaler
+
+El panel te dice lo que ha encontrado:
+
+| Mensaje                                | Qué hacer                                                                                                               |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **Immersive Scaler is not installed!** | Haz clic en **Download Immersive Scaler**, instala como extensión el zip de su página de versiones y luego vuelve aquí. |
+| **Immersive Scaler is not enabled!**   | Haz clic en **Enable Immersive Scaler**. Cats desactiva las copias antiguas y activa la actual.                         |
+
+Cats necesita Immersive Scaler 0.5.2 o posterior. Una vez instalado y activado, sus controles aparecen directamente en este panel.
+
+<Shot
+	name="panel-model-scaling"
+	alt="El panel Model Scaling con un botón Immersive Scaler Help, el mensaje Immersive Scaler is not installed y un botón Download Immersive Scaler."
+	caption="Lo que muestra el panel hasta que instalas Immersive Scaler."
+/>
+
+## Usarlo
+
+Los controles pertenecen a Immersive Scaler, así que su propia guía es la referencia: haz clic en **Immersive Scaler Help** en la parte superior del panel para abrirla.
+
+<Aside type="tip">
+	Escala el avatar antes de crear el seguimiento ocular o los visemas, y antes de exportar. Cambiar
+	el tamaño después puede desplazar los huesos de los ojos y las shape keys.
+</Aside>

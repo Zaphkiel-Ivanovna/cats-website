@@ -1,0 +1,192 @@
+---
+interface Props {
+	t: {
+		title: string;
+		body: string;
+		timing: string;
+		before: string;
+		after: string;
+		items: { title: string; body: string }[];
+		more: string;
+	};
+	lang: string;
+	repoUrl: string;
+}
+
+const { t, lang, repoUrl } = Astro.props;
+
+const number = new Intl.NumberFormat(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const before = number.format(11.7);
+const after = number.format(2.0);
+---
+
+<section class="block">
+	<h2>{t.title}</h2>
+	<p class="intro">{t.body}</p>
+	<figure class="timing" data-lang={lang} data-from="11.7" data-to="2.0">
+		<p class="figures">
+			<span class="before">
+				<span class="strike">{before} s</span>
+				<small>{t.before}</small>
+			</span>
+			<span class="arrow" aria-hidden="true">
+				→
+			</span>
+			<span class="after">
+				<span>
+					<span class="value">{after}</span> s
+				</span>
+				<small>{t.after}</small>
+			</span>
+		</p>
+		<figcaption>{t.timing}</figcaption>
+	</figure>
+	<div class="items">
+		{t.items.map((item) => (
+			<p>
+				<strong>{item.title}</strong> {item.body}
+			</p>
+		))}
+	</div>
+	<p class="more">
+		<a href={`${repoUrl}/commits/main`}>{t.more}</a>
+	</p>
+</section>
+
+<style>
+	.timing {
+		margin: 2.5rem 0 0;
+	}
+	.figures {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.5rem 1.25rem;
+		font-family: var(--sl-font-mono);
+		font-size: clamp(2rem, 5vw, 3.25rem);
+		font-weight: 600;
+		letter-spacing: -0.04em;
+		font-variant-numeric: tabular-nums;
+	}
+	.before,
+	.after {
+		display: inline-grid;
+	}
+	.before {
+		color: var(--sl-color-gray-4);
+	}
+	.strike {
+		position: relative;
+	}
+	.strike::after {
+		content: '';
+		position: absolute;
+		left: -0.05em;
+		right: -0.05em;
+		top: 52%;
+		height: 0.06em;
+		background: currentColor;
+		transform-origin: left center;
+	}
+	.arrow,
+	.after {
+		transition:
+			opacity 0.4s ease-out,
+			translate 0.4s ease-out;
+	}
+	.timing.is-armed .strike::after {
+		scale: 0 1;
+	}
+	.timing.is-armed .arrow,
+	.timing.is-armed .after {
+		opacity: 0;
+		translate: -0.25em 0;
+	}
+	.timing.is-playing .strike::after {
+		scale: 1 1;
+		transition: scale 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+	}
+	.after {
+		color: var(--sl-color-white);
+	}
+	.arrow {
+		color: var(--sl-color-accent);
+		font-weight: 400;
+	}
+	small {
+		font-family: var(--sl-font);
+		font-size: var(--sl-text-xs);
+		font-weight: 400;
+		letter-spacing: 0;
+		color: var(--sl-color-gray-3);
+	}
+	figcaption {
+		margin-top: 0.75rem;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-3);
+	}
+	.items {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1.5rem 3rem;
+		margin-top: 2.5rem;
+	}
+	.items p {
+		line-height: 1.65;
+		color: var(--sl-color-gray-2);
+	}
+	strong {
+		font-weight: 600;
+		color: var(--sl-color-white);
+	}
+	.more {
+		margin-top: 2rem;
+		font-size: var(--sl-text-sm);
+	}
+	.more a {
+		color: var(--sl-color-accent);
+		text-underline-offset: 4px;
+	}
+	@media (max-width: 40rem) {
+		.items {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
+
+<script>
+	const easeOut = (t: number) => 1 - (1 - t) ** 3;
+
+	for (const figure of document.querySelectorAll<HTMLElement>('.timing')) {
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) continue;
+		const value = figure.querySelector<HTMLElement>('.value')!;
+		const from = Number(figure.dataset.from);
+		const to = Number(figure.dataset.to);
+		const format = new Intl.NumberFormat(figure.dataset.lang, {
+			minimumFractionDigits: 1,
+			maximumFractionDigits: 1,
+		});
+		figure.classList.add('is-armed');
+
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (!entry.isIntersecting) return;
+				observer.disconnect();
+				figure.classList.add('is-playing');
+				value.textContent = format.format(from);
+				setTimeout(() => {
+					figure.classList.remove('is-armed');
+					const start = performance.now();
+					const tick = (now: number) => {
+						const t = Math.min(1, (now - start) / 1100);
+						value.textContent = format.format(from + (to - from) * easeOut(t));
+						if (t < 1) requestAnimationFrame(tick);
+					};
+					requestAnimationFrame(tick);
+				}, 500);
+			},
+			{ threshold: 0.8 },
+		);
+		observer.observe(figure);
+	}
+</script>

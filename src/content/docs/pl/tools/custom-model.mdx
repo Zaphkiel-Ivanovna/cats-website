@@ -1,0 +1,75 @@
+---
+title: Custom Model Creation
+description: Scal szkielet jednego modelu z innym, na przykład aby dodać nowy strój lub część ciała, albo przypnij pojedynczą siatkę do kości.
+sourceUpdated: 2026-09-23
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**Custom Model Creation** łączy modele. Ma dwie sekcje: **Merge Armatures**, do scalania dwóch modeli z riggiem w jeden, oraz **Attach Mesh**, do przypinania obiektu bez riggu do pojedynczej kości.
+
+## Merge Armatures
+
+Służy do nakładania stroju, włosów lub części ciała z riggiem na awatara. Sekcja wymaga co najmniej dwóch szkieletów w scenie; przy mniejszej liczbie wyświetla tylko **Two armatures are required!**
+
+### Przed scaleniem
+
+- Uruchom [Fix MMD Model](../mmd-options/) na obu modelach, jeśli są to surowe importy MMD lub VRM, aby ich kości miały te same standardowe nazwy.
+- Ustaw na miejscu tylko **siatkę** dodawanego modelu. Cats sam przesunie jego kości, aby pasowały do szkieletu bazowego.
+- Żaden szkielet nie może współdzielić danych z innym obiektem. Jeśli tak jest, najpierw uruchom **Object > Relations > Make Single User**.
+
+### Scalanie
+
+<Steps>
+
+1. W **Base** wybierz szkielet, który zostaje: zwykle awatara.
+
+2. W **To Merge** wybierz dodawany szkielet.
+
+3. Jeśli Cats wyświetla **Armatures can be merged automatically!**, oba szkielety mają te same nazwy głównych kości i można kontynuować. W przeciwnym razie w **Attach to** wybierz kość szkieletu bazowego, z której ma zwisać nowa część.
+
+4. Ustaw opcje i kliknij **Merge Armatures**.
+
+</Steps>
+
+Cats zgłasza **Armatures successfully joined.** Kości o tej samej nazwie są scalane, a ich wagi sumowane.
+
+| Opcja                        | Domyślnie | Działanie                                                                                                                                                                                             |
+| ---------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Merge All Bones**          | Wyłączone | Scala wszystkie kości o tej samej nazwie, nie tylko główne (Hips, Spine i tak dalej). Zmień nazwy kości, które chcesz scalić, tak aby się zgadzały. Potem sprawdź wynik: może to mieć skutki uboczne. |
+| **Apply Transforms**         | Wyłączone | Zaznacz, jeśli oba modele są już dokładnie tam, gdzie powinny. Podczas scalania pozostaną na miejscu.                                                                                                 |
+| **Join Meshes**              | Włączone  | Po scaleniu łączy wszystkie siatki w jedną.                                                                                                                                                           |
+| **Remove Zero Weight Bones** | Włączone  | Usuwa kości, które po scaleniu nie poruszają żadnych wierzchołków.                                                                                                                                    |
+| **Cleanup Shape Keys**       | Włączone  | Usuwa shape keys, które nic nie robią. Odznacz, jeśli znikają shape keys, których potrzebujesz.                                                                                                       |
+
+### Błędy transformacji
+
+Scalanie wymaga, aby oba szkielety miały tę samą skalę, a dodawany model nie był obrócony. Jeśli tak nie jest, Cats przerywa z komunikatem **Transform Issue Detected!** Zaznacz **Apply Transforms** albo zaznacz oba obiekty i zastosuj ich transformacje przez <kbd>Ctrl</kbd> + <kbd>A</kbd> > **All Transforms**.
+
+Jeśli szkielet ma obiekt nadrzędny, ten obiekt musi mieć położenie 0, obrót 0 i skalę 1 albo zastosowane transformacje.
+
+## Attach Mesh
+
+Służy do sztywnych akcesoriów: kapelusza, okularów, broni. Siatka nie może mieć jeszcze rodzica.
+
+<Steps>
+
+1. W **Base** wybierz szkielet.
+
+2. W **Mesh** wybierz siatkę bez rodzica.
+
+3. W **Attach to** wybierz kość, za którą ma podążać, na przykład Head dla kapelusza.
+
+4. Kliknij **Attach Mesh**.
+
+</Steps>
+
+Cats podpina siatkę do szkieletu, tworzy pod wybraną kością nową kość nazwaną tak jak siatka i przypisuje do niej wagi całej siatki. Zgłasza **Mesh successfully attached to armature.**
+
+<Aside type="caution">
+	Attach Mesh usuwa istniejące grupy wierzchołków siatki i przypisuje każdy wierzchołek do jednej
+	kości. Nadaje się to tylko do sztywnych obiektów: kurtka czy spódnica potrzebują kilku kości i nie
+	będą się poprawnie deformować. Jeśli skala siatki nie jest jednolita, najpierw ją zastosuj.
+</Aside>
+
+Przycisk **How to use** na górze otwiera dokumentację upstream tego panelu.

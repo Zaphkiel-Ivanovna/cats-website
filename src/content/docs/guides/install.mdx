@@ -1,0 +1,64 @@
+---
+title: Installation
+description: Install Cats as a Blender 5.x extension from the release zip, update it, or build it from a checkout.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Cats is a Blender **extension**. It runs on Blender 5.0, 5.1 and 5.2, and one build covers all three.
+
+## Install from the release zip
+
+<Steps>
+
+1. Download `cats_blender_plugin-<version>.zip` from the [latest release](https://github.com/Zaphkiel-Ivanovna/cats-blender-plugin-unofficial/releases/latest). Keep it zipped: Blender installs the archive itself.
+
+2. In Blender, open **Edit > Preferences > Get Extensions**.
+
+3. Click the dropdown at the top right of the window and pick **Install from Disk**.
+
+4. Select the zip. Blender installs and enables the extension.
+
+5. In the 3D Viewport, press <kbd>N</kbd> to open the sidebar and click the **CATS** tab.
+
+</Steps>
+
+<Aside type="caution" title="Unsupported Blender versions">
+	The manifest declares Blender 5.0 as the minimum and stops before 5.3, so Blender will not offer
+	Cats to other versions. The add-on also checks the version when it loads and refuses to start
+	outside that range. For Blender 4.x and older, use the [upstream release
+	line](https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-) made for your version.
+</Aside>
+
+## What Cats asks permission for
+
+Extensions declare what they need. Cats asks for two permissions:
+
+| Permission | Why                                                        |
+| ---------- | ---------------------------------------------------------- |
+| Files      | Import and export model files, and cache translation data. |
+| Network    | Download translations and check for add-on updates.        |
+
+Translation through Google and update checking are the only features that use the network.
+
+## Update Cats
+
+When a new release is out, a notice appears at the top of the [Quick Access](../../tools/quick-access/) panel with **Update Now**, **Remind me later** and **Ignore this version**. You can also check by hand in [Settings & Updates](../../tools/settings/#updates). Either way, Cats installs the update through Blender's own extension installer, then asks you to restart Blender.
+
+You can also download the new zip yourself and install it over the old version with **Install from Disk**.
+
+## Build it from a checkout
+
+If you work on the add-on itself, you can build the zip from a clone of the repository:
+
+```sh
+git clone https://github.com/Zaphkiel-Ivanovna/cats-blender-plugin-unofficial.git
+cd cats-blender-plugin-unofficial
+blender --command extension build
+```
+
+Blender writes `cats_blender_plugin-<version>.zip` next to the manifest. Install it with **Install from Disk** as above.
+
+## Next step
+
+Follow the [quick start](../quick-start/) to take a model from import to a VRChat-ready avatar.

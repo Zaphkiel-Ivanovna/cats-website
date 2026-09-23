@@ -1,0 +1,70 @@
+---
+title: Other Options
+description: Tłumaczenie japońskich nazw na angielski, dzielenie siatek, naprawa normalnych oraz zestaw dodatkowych narzędzi do shape keys, kości skrętu i nóg.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+**Other Options** zbiera narzędzia, które nie pasują gdzie indziej. Panel jest domyślnie zwinięty, a przełącznik **Show More Options** odsłania drugi zestaw narzędzi.
+
+<Shot
+	name="panel-other-options"
+	alt="Panel Other Options z włączonym Show More Options: Separate by, Translate, Normals oraz narzędzia do shape keys i kości."
+	caption="Other Options z włączonym Show More Options."
+/>
+
+## Separate by
+
+Dzieli aktywną siatkę lub jedyną siatkę modelu:
+
+- **Materials** tworzy jedną siatkę na każdy materiał.
+- **Loose Parts** tworzy jedną siatkę na każdy niepołączony fragment, co daje większą kontrolę.
+- **Shapes** dzieli siatkę na dwie części: poruszaną przez shape keys i resztę. Przydaje się przed ręczną decymacją, bo można wtedy zdecymować część statyczną bez naruszania twarzy.
+
+<Aside type="caution">
+	Nigdy nie decymuj części, na której mogą być później potrzebne shape keys: twarzy, ust, oczu.
+</Aside>
+
+## Translate
+
+Modele MMD zwykle mają japońskie nazwy. Te przyciski tłumaczą je na angielski:
+
+- **All** tłumaczy kości, shape keys, obiekty i materiały, w tej kolejności.
+- **Shape Keys**, **Objects**, **Bones** i **Materials** tłumaczą jeden rodzaj nazw.
+
+Cats najpierw szuka nazw we wbudowanym słowniku, a resztę wysyła do Google Translate. Wyniki Google są zapisywane w pamięci podręcznej na komputerze, więc ta sama nazwa jest wysyłana tylko raz. Kości i shape keys są tłumaczone we **wszystkich** szkieletach i siatkach w pliku, nie tylko w zaznaczonym modelu. Shape keys zaczynające się od `vrc.` nigdy nie są zmieniane.
+
+Dwie opcje zmieniają sposób tłumaczenia shape keys:
+
+- **Use Old Translations (not recommended)** pomija słownik i korzysta tylko z Google, tak jak Cats 0.9.0 i starsze. Używaj jej tylko wtedy, gdy masz animacje zależne od starych nazw.
+- **Skip Locked Shape Keys** pomija shape keys zablokowane ikoną kłódki na liście shape keys w Blenderze.
+
+Jeśli Google jest nieosiągalny lub na jakiś czas Cię blokuje, Cats i tak stosuje swój słownik i zgłasza, że części nazw nie udało się przetłumaczyć. Resztę spróbuj przetłumaczyć później. Pamięć podręczną można wyczyścić w [Settings & Updates](../settings/).
+
+## Show More Options
+
+### Normalne
+
+- **Recalculate** ponownie kieruje normalne aktywnej siatki na zewnątrz. Użyj tej opcji, gdy niektóre ściany wyglądają na odwrócone lub ciemniejsze. Nie używaj jej na siatkach, które już wyglądają poprawnie.
+- **Flip** odwraca wszystkie normalne, w przypadku siatek całkowicie wywróconych na lewą stronę.
+
+### Transformacje
+
+**Apply Transformations** stosuje położenie, obrót i skalę szkieletu i jego siatek. Mały przycisk obok stosuje je do wszystkich obiektów w scenie.
+
+### Shape keys
+
+- **Remove Unused Shapekeys** usuwa shape keys aktywnej siatki, które nie poruszają żadnego wierzchołka. `vrc.v_sil` jest zawsze zachowywany. Siatka musi być zaznaczona, w trybie Object.
+- **Repair Broken Shapekeys** próbuje naprawić shape keys uszkodzone przez niektóre operacje Blendera.
+- **Optimize Static Shapekeys** przenosi część siatki, na którą wpływają shape keys, do osobnej siatki i usuwa shape keys z reszty, której nazwa zmienia się na `Static`. Zmniejsza to obciążenie GPU przez awatara. Najpierw połącz siatki: Cats odmawia działania na kilku siatkach.
+- **Fix Koikatsu Shapekeys** naprawia shape keys modeli z Koikatsu.
+
+Menu shape keys we właściwościach Object Data w Blenderze zyskuje też dwie pozycje od Cats: **Apply Selected Shapekey to Basis**, która wypala wybrany klucz w Basis i zachowuje odwróconą kopię, oraz **Remove Unused Shapekeys**.
+
+### Kości
+
+- **Create Digitigrade Legs** zamienia nogę w nogę palcochodną, dla awatarów o zwierzęcej budowie. Najpierw zaznacz dwie kości w trybie Edit; link **How to use** otwiera samouczek.
+- **Generate Twist Bones** dodaje kości skrętu do zaznaczonych kości i dzieli ich wagi. **Upper Body** obejmuje też kręgosłup i szyję.
+- **Convert Bones To Valve** zmienia nazwy głównych kości na nazwy z Source Engine. Model musi najpierw mieć standardowe nazwy nadane przez [Fix MMD Model](../mmd-options/).

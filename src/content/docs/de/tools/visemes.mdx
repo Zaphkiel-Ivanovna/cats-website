@@ -1,0 +1,102 @@
+---
+title: Visemes
+description: Die fünfzehn vrc.v_* Shape Keys für die Lippensynchronisation, die VRChat liest, aus drei Mundformen erzeugen, die das Modell bereits hat.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+VRChat steuert die Lippensynchronisation über fünfzehn Shape Keys namens `vrc.v_aa` bis `vrc.v_th`. Die meisten Modelle bringen nur eine Handvoll Mundformen mit. Das Panel **Visemes** erzeugt alle fünfzehn, indem es drei gewählte Formen mischt: ein offenes „aa“, ein gerundetes „oh“ und ein zusammengebissenes „ch“.
+
+Das Panel ist im CATS-Tab anfangs eingeklappt.
+
+## Vorbereitung
+
+- Das Mesh mit den Mund-Shape-Keys muss der Armatur untergeordnet sein. Cats listet nur Meshes, die Kinder der Armatur des Modells sind; ein loses Mesh führt zu **No meshes found!**.
+- Die Meshes zuerst vereinen, damit das Gesicht mit allen seinen Shape Keys in einem Mesh landet. [Fix MMD Model](../mmd-options/) erledigt das bei frischen MMD- und VRM-Importen, **Join all meshes** in [Quick Access](../quick-access/) bei jedem Modell.
+- Drei Shape Keys suchen, die den Mund tatsächlich bewegen. Bei MMD-Modellen heißen sie vor der Übersetzung meist `あ`, `お` und `い`, danach `A`, `O` und `I`.
+
+## Viseme erstellen
+
+<Steps>
+
+1. **Visemes** im CATS-Tab öffnen. Hat das Modell mehrere Meshes, unter **Mesh** das Mesh mit dem Mund wählen.
+
+2. Die drei Mundformen festlegen:
+
+   | Feld          | Den Shape Key wählen, bei dem der Mund…                        |
+   | ------------- | -------------------------------------------------------------- |
+   | **Viseme AA** | weit offen ist, wie beim Sprechen von „aa“.                    |
+   | **Viseme OH** | gerundet ist, wie beim Sprechen von „oh“.                      |
+   | **Viseme CH** | offene Lippen und zusammengebissene Zähne zeigt, wie bei „ch“. |
+
+   Cats füllt diese Felder mit gängigen Namen wie `MTH A`, `Ah` oder `A` vor. Jedes Feld prüfen: Ein vorausgefüllter Name ist nur eine Vermutung und kann auf einen Key verweisen, den das Mesh nicht hat.
+
+3. **Shape Key Mix Intensity** für einen ersten Versuch auf `1.0` belassen. Öffnet sich der Mund zu weit, den Wert senken; wirkt die Lippensynchronisation zu schwach, ihn erhöhen. Der Bereich reicht von 0 bis 10.
+
+4. Auf **Preview Visemes** klicken und im Dropdown die Laute durchgehen, um jede Mischung am Modell zu sehen. Auf **Stop Preview** klicken, um die Shape Keys in ihren vorherigen Zustand zurückzusetzen.
+
+5. Auf **Create Visemes** klicken. Cats meldet **Created mouth visemes!**, sobald es fertig ist.
+
+</Steps>
+
+<Shot
+	name="panel-visemes"
+	alt="Das Panel Visemes mit Viseme AA, OH und CH auf Fcl_MTH_A, Fcl_MTH_O und Fcl_MTH_I, Shape Key Mix Intensity auf 1.00 und dem Button Create Visemes."
+	caption="Die drei Mundformen eines VRoid-Modells, im Panel ausgewählt."
+/>
+
+<Aside type="caution" title="Niemals Basis wählen">
+	Basis ist die neutrale Form und bewegt den Mund nicht. Cats verweigert die Ausführung mit **Please
+	select the correct mouth shapekeys instead of "Basis"!**
+</Aside>
+
+## Wie jedes Visem gemischt wird
+
+Jeder erzeugte Key ist eine Mischung der drei Formen. Die folgenden Gewichte werden mit **Shape Key Mix Intensity** multipliziert.
+
+<Shot
+	name="visemes-faces"
+	alt="Dreimal dasselbe Gesicht: mit weit geöffnetem Mund, mit gerundetem Mund und mit geöffneten Lippen über zusammengebissenen Zähnen."
+	caption="vrc.v_aa, vrc.v_oh und vrc.v_ch, erzeugt aus einem VRoid-Gesicht."
+/>
+
+| Shape Key   | AA      | OH      | CH      |
+| ----------- | ------- | ------- | ------- |
+| `vrc.v_aa`  | 1       |         |         |
+| `vrc.v_ch`  |         |         | 1       |
+| `vrc.v_dd`  | 0.3     |         | 0.7     |
+| `vrc.v_e`   | 0.5     |         | 0.2     |
+| `vrc.v_ff`  | 0.2     |         | 0.4     |
+| `vrc.v_ih`  |         | 0.3     | 0.7     |
+| `vrc.v_kk`  | 0.7     |         | 0.4     |
+| `vrc.v_nn`  | 0.2     |         | 0.7     |
+| `vrc.v_oh`  | 0.2     | 0.8     |         |
+| `vrc.v_ou`  |         | 1       |         |
+| `vrc.v_pp`  | minimal | minimal |         |
+| `vrc.v_rr`  |         | 0.3     | 0.5     |
+| `vrc.v_sil` | minimal |         | minimal |
+| `vrc.v_ss`  |         |         | 0.8     |
+| `vrc.v_th`  | 0.4     | 0.15    |         |
+
+`vrc.v_pp` und `vrc.v_sil` sind fast geschlossene Münder. Cats gibt ihnen ein sehr kleines Gewicht, damit keine zwei Keys exakt identisch sind.
+
+## Was sich sonst noch ändert
+
+Das Erstellen von Visemen fügt nicht nur fünfzehn Keys hinzu. Mit diesen Nebenwirkungen ist zu rechnen:
+
+- Ein vorhandener Key mit gleichem Namen, etwa ein altes `vrc.v_aa`, wird gelöscht und neu erstellt.
+- Die Shape Keys werden sortiert: zuerst Basis, dann die Keys `vrc.blink_*` und `vrc.lowerlid_*` aus [Eye Tracking](../eye-tracking/), dann die Viseme.
+- Das Armaturobjekt wird in `Armature` umbenannt, und ein Empty, dem die Armatur untergeordnet ist, wird entfernt.
+- Während des Vorgangs werden alle Objekte eingeblendet und in den Object mode geschaltet.
+
+## Wenn etwas falsch aussieht
+
+- **Der Mund reißt auf oder dehnt sich.** **Shape Key Mix Intensity** senken und die Viseme erneut erstellen. Cats warnt möglicherweise auch, dass ein Visem das Mesh stark verformt, wenn sich ein Vertex um 40 % oder mehr der Mesh-Größe bewegt.
+- **Ein erneuter Durchlauf scheint nichts zu ändern.** Cats merkt sich die bereits erstellten Mischungen für die laufende Blender-Sitzung. Werden die Viseme erneut mit denselben drei Quell-Keys erstellt, können einige übersprungen werden. Vor dem Ausprobieren einer anderen Intensität Blender neu starten.
+- **Das Panel zeigt `VisemePanel.error.noShapekeys`.** Dieser rohe Text bedeutet, dass das ausgewählte Mesh überhaupt keine Shape Keys hat. Das Mesh wählen, das das Gesicht enthält.
+
+## Weiter
+
+In Unity den Avatar Descriptor öffnen, **Lip Sync** auf **Viseme Blend Shape** setzen und das Mesh auswählen. Da die Keys die Namen `vrc.v_*` tragen, füllt die automatische Erkennung des SDK jeden Viseme-Slot selbst aus.

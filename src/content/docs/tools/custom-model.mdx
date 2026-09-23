@@ -1,0 +1,74 @@
+---
+title: Custom Model Creation
+description: Merge the armature of one model into another, for example to add a new outfit or body part, or attach a single mesh to a bone.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**Custom Model Creation** combines models. It has two sections: **Merge Armatures**, to join two rigged models into one, and **Attach Mesh**, to glue an unrigged object to a single bone.
+
+## Merge Armatures
+
+Use it to put a rigged outfit, hair or body part onto an avatar. The section needs at least two armatures in the scene; with fewer, it only shows **Two armatures are required!**
+
+### Before you merge
+
+- Run [Fix MMD Model](../mmd-options/) on both models if they are raw MMD or VRM imports, so their bones share the same standard names.
+- Move only the **mesh** of the model you are adding into place. Cats moves its bones to match the base armature.
+- Neither armature may share its data with another object. If one does, run **Object > Relations > Make Single User** first.
+
+### Merge
+
+<Steps>
+
+1. In **Base**, pick the armature that stays: usually the avatar.
+
+2. In **To Merge**, pick the armature you are adding.
+
+3. If Cats shows **Armatures can be merged automatically!**, the two share their main bone names and you can go on. Otherwise pick the bone of the base armature the new part should hang from in **Attach to**.
+
+4. Set the options, then click **Merge Armatures**.
+
+</Steps>
+
+Cats reports **Armatures successfully joined.** Bones with the same name are merged, and their weights are added together.
+
+| Option                       | Default | What it does                                                                                                                                                                                    |
+| ---------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Merge All Bones**          | Off     | Merges every bone with the same name, not only the main bones (Hips, Spine and so on). Rename the bones you want merged so they match. Check the result afterwards: this can have side effects. |
+| **Apply Transforms**         | Off     | Tick this if both models are already exactly where they should be. They stay in place while merging.                                                                                            |
+| **Join Meshes**              | On      | Joins all meshes into one after merging.                                                                                                                                                        |
+| **Remove Zero Weight Bones** | On      | Deletes bones that move no vertices after the merge.                                                                                                                                            |
+| **Cleanup Shape Keys**       | On      | Removes shape keys that do nothing. Untick it if shape keys you want disappear.                                                                                                                 |
+
+### Transform errors
+
+Merging expects both armatures at the same scale, and the model you add with no rotation. If that is not the case, Cats stops with **Transform Issue Detected!** Either tick **Apply Transforms**, or select both objects and apply their transforms with <kbd>Ctrl</kbd> + <kbd>A</kbd> > **All Transforms**.
+
+If an armature has a parent object, that parent must be at location 0, rotation 0 and scale 1, or have its transforms applied.
+
+## Attach Mesh
+
+Use it for rigid accessories: a hat, glasses, a weapon. The mesh must have no parent yet.
+
+<Steps>
+
+1. In **Base**, pick the armature.
+
+2. In **Mesh**, pick the unparented mesh.
+
+3. In **Attach to**, pick the bone it should follow, such as Head for a hat.
+
+4. Click **Attach Mesh**.
+
+</Steps>
+
+Cats parents the mesh to the armature, creates a new bone named after the mesh under the chosen bone, and weights the whole mesh to it. It reports **Mesh successfully attached to armature.**
+
+<Aside type="caution">
+	Attach Mesh deletes the mesh's existing vertex groups and assigns every vertex to one bone. That
+	suits rigid objects only: a jacket or a skirt needs several bones and will not deform correctly.
+	Apply the mesh's scale first if it is not uniform.
+</Aside>
+
+The **How to use** button at the top opens the upstream documentation for this panel.

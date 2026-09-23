@@ -1,0 +1,75 @@
+---
+title: Custom Model Creation
+description: Fusiona la armadura de un modelo con la de otro, por ejemplo para añadir un nuevo conjunto de ropa o una parte del cuerpo, o fija una sola malla a un hueso.
+sourceUpdated: 2026-09-23
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**Custom Model Creation** combina modelos. Tiene dos secciones: **Merge Armatures**, para unir dos modelos con rig en uno solo, y **Attach Mesh**, para pegar un objeto sin rig a un único hueso.
+
+## Merge Armatures
+
+Úsalo para poner ropa, pelo o una parte del cuerpo con rig en un avatar. La sección necesita al menos dos armaduras en la escena; con menos, solo muestra **Two armatures are required!**
+
+### Antes de fusionar
+
+- Ejecuta [Fix MMD Model](../mmd-options/) en ambos modelos si son importaciones en bruto de MMD o VRM, para que sus huesos compartan los mismos nombres estándar.
+- Coloca en su sitio solo la **malla** del modelo que añades. Cats mueve sus huesos para que coincidan con la armadura base.
+- Ninguna de las armaduras puede compartir sus datos con otro objeto. Si alguna lo hace, ejecuta antes **Object > Relations > Make Single User**.
+
+### Fusionar
+
+<Steps>
+
+1. En **Base**, elige la armadura que se queda: normalmente el avatar.
+
+2. En **To Merge**, elige la armadura que añades.
+
+3. Si Cats muestra **Armatures can be merged automatically!**, las dos comparten los nombres de sus huesos principales y puedes continuar. Si no, elige en **Attach to** el hueso de la armadura base del que debe colgar la nueva parte.
+
+4. Configura las opciones y haz clic en **Merge Armatures**.
+
+</Steps>
+
+Cats muestra **Armatures successfully joined.** Los huesos con el mismo nombre se fusionan y sus pesos se suman.
+
+| Opción                       | Por defecto | Qué hace                                                                                                                                                                                                              |
+| ---------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Merge All Bones**          | Desactivado | Fusiona todos los huesos con el mismo nombre, no solo los principales (Hips, Spine, etc.). Renombra los huesos que quieras fusionar para que coincidan. Revisa el resultado después: puede tener efectos secundarios. |
+| **Apply Transforms**         | Desactivado | Márcalo si los dos modelos ya están exactamente donde deben estar. Se quedan en su sitio durante la fusión.                                                                                                           |
+| **Join Meshes**              | Activado    | Une todas las mallas en una después de fusionar.                                                                                                                                                                      |
+| **Remove Zero Weight Bones** | Activado    | Borra los huesos que no mueven ningún vértice después de la fusión.                                                                                                                                                   |
+| **Cleanup Shape Keys**       | Activado    | Elimina las shape keys que no hacen nada. Desmárcalo si desaparecen shape keys que quieres conservar.                                                                                                                 |
+
+### Errores de transformación
+
+La fusión espera que las dos armaduras tengan la misma escala y que el modelo que añades no tenga rotación. Si no es así, Cats se detiene con **Transform Issue Detected!** Marca **Apply Transforms**, o selecciona los dos objetos y aplica sus transformaciones con <kbd>Ctrl</kbd> + <kbd>A</kbd> > **All Transforms**.
+
+Si una armadura tiene un objeto padre, ese padre debe estar en posición 0, rotación 0 y escala 1, o tener sus transformaciones aplicadas.
+
+## Attach Mesh
+
+Úsalo para accesorios rígidos: un sombrero, unas gafas, un arma. La malla aún no debe tener padre.
+
+<Steps>
+
+1. En **Base**, elige la armadura.
+
+2. En **Mesh**, elige la malla sin padre.
+
+3. En **Attach to**, elige el hueso que debe seguir, como Head para un sombrero.
+
+4. Haz clic en **Attach Mesh**.
+
+</Steps>
+
+Cats emparenta la malla con la armadura, crea bajo el hueso elegido un nuevo hueso con el nombre de la malla y asigna a ese hueso los pesos de toda la malla. Muestra **Mesh successfully attached to armature.**
+
+<Aside type="caution">
+	Attach Mesh borra los grupos de vértices que ya tenga la malla y asigna todos los vértices a un
+	solo hueso. Eso solo sirve para objetos rígidos: una chaqueta o una falda necesitan varios huesos
+	y no se deformarán bien. Si la escala de la malla no es uniforme, aplícala antes.
+</Aside>
+
+El botón **How to use** de la parte superior abre la documentación original de este panel.

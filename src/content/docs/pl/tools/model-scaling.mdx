@@ -1,0 +1,36 @@
+---
+title: Model Scaling
+description: Zmień rozmiar awatara i dostosuj jego proporcje za pomocą dodatku Immersive Scaler, który obsługuje panel Model Scaling.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**Model Scaling** sam nie skaluje modelu. Wyświetla interfejs **Immersive Scaler**, osobnego dodatku do zmiany rozmiaru awatarów do docelowego wzrostu i poprawiania ich proporcji pod VR.
+
+## Instalacja Immersive Scaler
+
+Panel informuje, co znalazł:
+
+| Komunikat                              | Co zrobić                                                                                             |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Immersive Scaler is not installed!** | Kliknij **Download Immersive Scaler**, zainstaluj plik zip ze strony wydań jako dodatek i wróć tutaj. |
+| **Immersive Scaler is not enabled!**   | Kliknij **Enable Immersive Scaler**. Cats wyłącza starsze kopie i włącza aktualną.                    |
+
+Cats wymaga Immersive Scaler w wersji 0.5.2 lub nowszej. Po instalacji i włączeniu jego elementy sterujące pojawiają się bezpośrednio w tym panelu.
+
+<Shot
+	name="panel-model-scaling"
+	alt="Panel Model Scaling z przyciskiem Immersive Scaler Help, komunikatem Immersive Scaler is not installed i przyciskiem Download Immersive Scaler."
+	caption="Widok panelu do czasu instalacji Immersive Scaler."
+/>
+
+## Użycie
+
+Elementy sterujące należą do Immersive Scaler, więc punktem odniesienia jest jego własny przewodnik: kliknij **Immersive Scaler Help** na górze panelu, aby go otworzyć.
+
+<Aside type="tip">
+	Przeskaluj awatara przed utworzeniem śledzenia oczu lub wizemów oraz przed eksportem. Zmiana
+	rozmiaru później może przesunąć kości oczu i shape keys.
+</Aside>

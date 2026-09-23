@@ -1,0 +1,137 @@
+---
+import { Icon } from 'astro-icon/components';
+import { pageIcons } from '../../icons';
+
+type Key =
+	| 'quickAccess'
+	| 'optimization'
+	| 'customModel'
+	| 'mmdOptions'
+	| 'otherOptions'
+	| 'visemes'
+	| 'boneParenting'
+	| 'modelScaling'
+	| 'eyeTracking'
+	| 'settings';
+
+interface Props {
+	t: { title: string; body: string; items: Record<Key, string> };
+	base: string;
+}
+
+const { t, base } = Astro.props;
+
+const panels: { key: Key; name: string; slug: string }[] = [
+	{ key: 'quickAccess', name: 'Quick Access', slug: 'quick-access' },
+	{ key: 'optimization', name: 'Optimization', slug: 'optimization' },
+	{ key: 'customModel', name: 'Custom Model Creation', slug: 'custom-model' },
+	{ key: 'mmdOptions', name: 'MMD Options', slug: 'mmd-options' },
+	{ key: 'otherOptions', name: 'Other Options', slug: 'other-options' },
+	{ key: 'visemes', name: 'Visemes', slug: 'visemes' },
+	{ key: 'boneParenting', name: 'Bone Parenting', slug: 'bone-parenting' },
+	{ key: 'modelScaling', name: 'Model Scaling', slug: 'model-scaling' },
+	{ key: 'eyeTracking', name: 'Eye Tracking', slug: 'eye-tracking' },
+	{ key: 'settings', name: 'Settings & Updates', slug: 'settings' },
+];
+---
+
+<section class="block panels">
+	<h2>{t.title}</h2>
+	<p class="intro">{t.body}</p>
+	<ul>
+		{panels.map((panel) => (
+			<li>
+				<a href={`${base}/tools/${panel.slug}/`}>
+					<Icon name={`ph:${pageIcons[`tools/${panel.slug}`]}`} class="panel-icon" />
+					<span class="name">
+						{panel.name}
+						<Icon name="ph:arrow-right" class="arrow" />
+					</span>
+					<span class="desc">{t.items[panel.key]}</span>
+				</a>
+			</li>
+		))}
+	</ul>
+</section>
+
+<style>
+	.panels {
+		position: relative;
+	}
+	.panels::before {
+		content: '';
+		position: absolute;
+		z-index: -1;
+		inset-block: -3rem -2rem;
+		left: calc(50% - 50vw);
+		width: 100vw;
+		background-image: radial-gradient(circle, var(--sl-color-gray-4) 1.2px, transparent 1.6px);
+		background-size: 22px 22px;
+		background-position: center top;
+		-webkit-mask-image: radial-gradient(ellipse 55% 60% at 50% 55%, #000 10%, transparent 80%);
+		mask-image: radial-gradient(ellipse 55% 60% at 50% 55%, #000 10%, transparent 80%);
+		opacity: 0.8;
+		pointer-events: none;
+	}
+	ul {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		column-gap: 3rem;
+		margin: 2rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+	li {
+		margin: 0;
+		border-top: 1px solid var(--sl-color-gray-5);
+	}
+	a {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		column-gap: 0.85rem;
+		row-gap: 0.3rem;
+		padding: 1rem 0 1.1rem;
+		text-decoration: none;
+	}
+	a :global(.panel-icon) {
+		grid-row: span 2;
+		margin-top: 0.15rem;
+		font-size: 1.25rem;
+		color: var(--sl-color-gray-3);
+		transition:
+			color 0.2s ease-out,
+			scale 0.2s var(--cats-ease);
+	}
+	a:hover :global(.panel-icon) {
+		color: var(--sl-color-accent);
+		scale: 1.08;
+	}
+	.name {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-weight: 600;
+		color: var(--sl-color-white);
+	}
+	.name :global(.arrow) {
+		color: var(--sl-color-gray-4);
+		transition: translate 0.2s ease-out;
+	}
+	a:hover .name {
+		color: var(--sl-color-accent);
+	}
+	a:hover .name :global(.arrow) {
+		color: var(--sl-color-accent);
+		translate: 3px 0;
+	}
+	.desc {
+		font-size: var(--sl-text-sm);
+		line-height: 1.55;
+		color: var(--sl-color-gray-2);
+	}
+	@media (max-width: 40rem) {
+		ul {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

@@ -1,0 +1,12 @@
+{
+	"version": "1.0.1",
+	"blenderMin": "5.0.0",
+	"blenderMax": "5.3.0",
+	"blenderSeries": ["5.0", "5.1", "5.2"],
+	"repoUrl": "https://github.com/Zaphkiel-Ivanovna/cats-blender-plugin-unofficial",
+	"releaseUrl": "https://github.com/Zaphkiel-Ivanovna/cats-blender-plugin-unofficial/releases/tag/1.0.1",
+	"downloadUrl": "https://github.com/Zaphkiel-Ivanovna/cats-blender-plugin-unofficial/releases/download/1.0.1/cats_blender_plugin-1.0.1.zip",
+	"downloadName": "cats_blender_plugin-1.0.1.zip",
+	"releaseDate": "2026-09-22",
+	"syncedFrom": "1a865f89e6c54b27578128db626f52571eb49480"
+}

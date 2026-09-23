@@ -1,0 +1,115 @@
+---
+title: MMD Options
+description: Fix MMD Model convierte una importación en bruto de MMD o VRM en un rig humanoide limpio y estándar. Esta página explica qué cambia, sus ajustes y cuándo no usarlo.
+sourceUpdated: 2026-09-23
+---
+
+import Shot from '../../../../components/Shot.astro';
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**MMD Options** contiene las herramientas para modelos recién salidos de un importador: **Fix MMD Model**, sus ajustes y un botón para eliminar cuerpos rígidos y articulaciones. El panel empieza plegado.
+
+<Shot
+	name="panel-mmd-options"
+	alt="El panel MMD Options: un recuadro de aviso, el botón Fix MMD Model con su botón de ajustes y el botón Remove Rigidbodies and Joints."
+/>
+
+<Aside type="danger" title="Solo para importaciones recientes">
+	Usa estas herramientas solo con modelos MMD y VRM recién importados. Nunca las ejecutes sobre un
+	avatar que ya esté preparado para Unity y VRChat, como un modelo comprado en Booth o Gumroad:
+	renombran, fusionan y borran huesos, y lo romperán. Cats te pide confirmación antes de empezar.
+</Aside>
+
+## Fix MMD Model
+
+Fix MMD Model es la pasada principal de Cats. Toma los huesos, mallas y shape keys que ha generado un importador y los convierte en un rig humanoide estándar que Unity reconoce. Antes era el botón **Fix Model** de la parte superior de la pestaña CATS; ese botón se ha trasladado aquí.
+
+### Antes de ejecutarlo
+
+- Importa el modelo con **Import Model** en [Quick Access](../quick-access/). La extensión avisa de que los modelos importados de otra forma pueden hacer que Blender se cierre durante la corrección.
+- Mantén las mallas emparentadas con la armadura. Si no lo están, Cats se detiene con **No mesh inside the armature found!**
+- Asegúrate de que ninguna malla comparta sus datos con otro objeto. Si no, Cats se detiene y te pide que ejecutes antes **Object > Relations > Make Single User**.
+- Las armaduras de Rigify y metarig no son compatibles. Usa en su lugar una herramienta de Rigify a Unity.
+
+### Ejecutarlo
+
+<Steps>
+
+1. Abre **MMD Options**. Si quieres cambiar lo que hace la corrección, haz clic en el pequeño botón de ajustes junto a **Fix MMD Model** y ajusta las opciones descritas más abajo.
+
+2. Haz clic en **Fix MMD Model**, lee la confirmación y haz clic en **OK**.
+
+3. Espera a que aparezca **Model successfully fixed.** En un modelo grande tarda unos segundos.
+
+</Steps>
+
+Si no se han podido encontrar algunos huesos principales, Cats muestra al final una lista titulada **The following bones were not found:**. La corrección se completa igualmente, pero es probable que el modelo necesite trabajo manual en esas zonas.
+
+### Qué cambia
+
+Por orden, Fix MMD Model:
+
+1. **Revisa el modelo** y avisa de transformaciones bloqueadas, mallas sin grupos de vértices, coordenadas UV rotas o la falta de cadera, columna, cuello o cabeza.
+2. **Convierte los morphs de huesos de MMD en shape keys**, para que las expresiones hechas con huesos sobrevivan en Unity.
+3. **Limpia la escena**: elimina los cuerpos rígidos y las articulaciones, los hijos de la armadura que no son mallas, el Empty raíz de MMD y el cubo, la cámara y la luz por defecto de Blender. También se eliminan las físicas de Source Engine y las mallas LOD.
+4. **Une las mallas** en una sola, si **Join Meshes** está activado, y aplica todas las transformaciones.
+5. **Limpia las shape keys**: elimina las que son idénticas a Basis y las que empiezan por `mmd_`, y luego las ordena para que las `vrc.*` vayan justo después de Basis.
+6. **Traduce los nombres de los huesos** al inglés, usando primero el diccionario integrado y Google Translate para el resto.
+7. **Renombra los huesos según un esqueleto estándar**: Hips, Spine, Chest, Upper Chest, Neck, Head, hombros, brazos, codos, muñecas, piernas, rodillas, tobillos, dedos de los pies, ojos y dedos. Conoce cientos de alias de MMD, Mixamo, Source Engine, DAZ y otros rigs.
+8. **Reconstruye la jerarquía**: Hips pasa a ser la raíz, la columna se reconstruye como Spine, Chest y (si se conserva) Upper Chest, se añade un Neck si falta y la cadera se coloca entre las piernas.
+9. **Fusiona los pesos**: los pesos de los huesos auxiliares de MMD (Center, Groove, Waist, IK y huesos ficticios, huesos extra de columna y de torsión) se suman al hueso que se queda, y luego se borran esos huesos auxiliares.
+10. **Elimina todas las restricciones de huesos**, pone todos los huesos en una única colección `Bones` y restablece la pose.
+11. **Lo deja todo ordenado**: elimina los huesos sin pesos y conecta las cadenas de huesos si esas opciones están activadas, renombra el objeto de la armadura a `Armature` y da la vuelta al modelo si se importó bocabajo.
+
+También ajusta el rango de recorte del viewport, activa el backface culling y cambia la transformación de vista de la escena a **Standard**, para que lo que ves se parezca más a Unity.
+
+<Shot
+	name="bones-compare"
+	alt="Un avatar de VRoid dos veces. A la izquierda sus huesos se llaman J_Bip_C_Hips, J_Bip_C_Spine, J_Bip_L_UpperArm; a la derecha los mismos huesos son Hips, Spine, Left arm."
+	caption="La columna y el lado izquierdo de un rig de VRoid, tal como se importa (izquierda) y después de Fix MMD Model (derecha)."
+/>
+
+Algunos de los alias que Cats reconoce, sacados de las listas de huesos de la extensión:
+
+| Pasa a ser | Aparece en las importaciones                                |
+| ---------- | ----------------------------------------------------------- |
+| `Hips`     | `Mixamorig_Hips`, `Bip_Pelvis`, `LowerBody`, `B_C_Pelvis`   |
+| `Spine`    | `Mixamorig_Spine`, `UpperBody`, `Upper_Waist`, `UpperBody2` |
+| `Head`     | `Mixamorig_Head`, `Bip_Head`, `J_Bip_C_Head`, `B_C_Head`    |
+
+<Aside title="Huesos de torsión">
+	`HandTwist_L/R` y `ArmTwist_L/R` se renombran con el prefijo `z` (`zHandTwist_L`) y parte de su
+	peso pasa al codo o al brazo. Esto ocurre en cada ejecución, digan lo que digan las opciones de
+	torsión.
+</Aside>
+
+### Fix Model Settings
+
+El botón de ajustes junto a **Fix MMD Model** abre este cuadro de diálogo. Los cambios se aplican en cuanto marcas una casilla; **OK** solo lo cierra.
+
+| Ajuste                            | Por defecto | Qué hace                                                                                                                                                                                                                                 |
+| --------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Keep End Bones**                | Desactivado | Evita que el último hueso de cada cadena se borre como hueso sin pesos. Ayuda con las faldas con huesos de físicas y puede arreglar huesos de dedos arrugados en Unity. Solo tiene efecto si **Remove Zero Weight Bones** está activado. |
+| **Keep Upper Chest**              | Activado    | Conserva el hueso Upper Chest, que VRChat admite. Desactívalo solo para el sistema heredado SDK2: Upper Chest se fusiona entonces con Chest.                                                                                             |
+| **Keep Twist Bones**              | Desactivado | Conserva todos los huesos que tengan "Twist" en su nombre. Puedes renombrar los huesos que quieras proteger para que incluyan "Twist".                                                                                                   |
+| **Fix MMD Twist Bones**           | Activado    | Conserva los huesos de torsión del brazo de MMD llamados `ArmTwist[1-3]_[L/R]` y `HandTwist[1-3]_[L/R]` para que VRChat pueda usarlos.                                                                                                   |
+| **Join Meshes**                   | Activado    | Une todas las mallas del modelo en una. Casi siempre deberías dejarlo activado.                                                                                                                                                          |
+| **Connect Bones**                 | Activado    | Orienta cada hueso hacia su único hijo. Es puramente estético: no cambia cómo funcionan los huesos.                                                                                                                                      |
+| **Remove Zero Weight Bones**      | Activado    | Borra los huesos que no mueven ningún vértice. Los huesos humanoides principales y los huesos `Root_` siempre se conservan. Desactívalo si desaparecen huesos que necesitas.                                                             |
+| **Remove Rigidbodies and Joints** | Activado    | Borra los objetos de físicas de MMD, que VRChat no usa.                                                                                                                                                                                  |
+
+El cuadro de diálogo se muestra en gris mientras **Remove Zero Weight Bones** está desactivado. Las demás casillas siguen funcionando.
+
+## Remove Rigidbodies and Joints
+
+Los modelos de MMD incluyen cuerpos rígidos y articulaciones para la simulación de físicas propia de MMD. VRChat no los usa. Este botón borra todos los objetos del modelo cuyo nombre contiene `rigidbodies` o `joints`, y muestra **Removed rigidbodies and joints.** Fix MMD Model ya lo hace cuando su ajuste correspondiente está activado.
+
+<Aside type="note">
+	Aparte, un ajuste global en [Settings & Updates](../settings/), **Remove Rigidbodies and Joints
+	Global**, borra todas las colecciones con un nombre del tipo "rigidbody" cada vez que usas la
+	mayoría de los botones de Cats. Desactívalo si necesitas conservar las físicas de MMD.
+</Aside>
+
+## MMD Options Wiki
+
+El último botón abre la página de la wiki del proyecto original sobre estas opciones.
