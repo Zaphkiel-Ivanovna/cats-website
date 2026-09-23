@@ -21,4 +21,6 @@ Vercel builds the site with `vercel.json`. Optional environment variables are li
 - `GITHUB_TOKEN` raises the GitHub API limit when the releases menu is fetched at build time.
 - `SITE_URL` sets the canonical URL; on Vercel it defaults to the production domain.
 
+Vercel Web Analytics and Speed Insights are loaded on every page (`src/components/Footer.astro`); enable both in the Vercel project for data to be collected.
+
 Screenshots in `src/assets/screenshots/` are generated with `scripts/screenshots/run.py`.
