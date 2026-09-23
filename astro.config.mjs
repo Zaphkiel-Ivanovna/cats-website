@@ -31,6 +31,7 @@ export default defineConfig({
 			components: {
 				Hero: './src/components/Hero.astro',
 				PageTitle: './src/components/PageTitle.astro',
+				Head: './src/components/overrides/Head.astro',
 			},
 			social: [
 				{
