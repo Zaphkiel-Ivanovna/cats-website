@@ -3,9 +3,9 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import icon from 'astro-icon';
 import { sidebarPage } from './src/icons.ts';
+import { siteUrl } from './src/site.ts';
 
-const productionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-const site = process.env.SITE_URL || (productionHost ? `https://${productionHost}` : undefined);
+const site = siteUrl(process.env.SITE_URL, process.env.VERCEL_PROJECT_PRODUCTION_URL);
 
 export default defineConfig({
 	site,
