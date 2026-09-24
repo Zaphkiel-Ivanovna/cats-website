@@ -1,10 +1,19 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "cats-website",
+	"main": "worker/index.js",
 	"compatibility_date": "2026-09-24",
+	"workers_dev": true,
+	"preview_urls": false,
 	"assets": {
 		"directory": "./dist",
+		"binding": "ASSETS",
 		"html_handling": "force-trailing-slash",
 		"not_found_handling": "404-page",
+		"run_worker_first": ["/*", "!/_astro/*", "!/pagefind/*"],
+	},
+	"observability": {
+		"enabled": true,
+		"head_sampling_rate": 1,
 	},
 }

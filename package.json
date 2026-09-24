@@ -12,7 +12,8 @@
 		"format": "prettier --write .",
 		"icons": "node scripts/icons.mjs",
 		"deploy": "astro build && wrangler deploy",
-		"preview:cf": "astro build && wrangler dev"
+		"preview:cf": "astro build && wrangler dev",
+		"stats": "node --env-file-if-exists=.env scripts/stats.mjs"
 	},
 	"dependencies": {
 		"@astrojs/starlight": "^0.42.3",

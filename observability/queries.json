@@ -1,0 +1,574 @@
+{
+	"overview": {
+		"title": "Visitors and page views",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": false
+			},
+			{
+				"key": "status",
+				"operation": "eq",
+				"type": "number",
+				"value": 200
+			}
+		],
+		"calculations": [
+			{
+				"operator": "uniq",
+				"key": "visitor",
+				"keyType": "string",
+				"alias": "visitors"
+			},
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		]
+	},
+	"daily": {
+		"title": "Visitors per day",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": false
+			},
+			{
+				"key": "status",
+				"operation": "eq",
+				"type": "number",
+				"value": 200
+			}
+		],
+		"calculations": [
+			{
+				"operator": "uniq",
+				"key": "visitor",
+				"keyType": "string",
+				"alias": "visitors"
+			},
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		],
+		"granularity": 86400,
+		"timeseries": true
+	},
+	"pages": {
+		"title": "Top pages",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": false
+			},
+			{
+				"key": "status",
+				"operation": "eq",
+				"type": "number",
+				"value": 200
+			}
+		],
+		"calculations": [
+			{
+				"operator": "uniq",
+				"key": "visitor",
+				"keyType": "string",
+				"alias": "visitors"
+			},
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		],
+		"groupBys": [
+			{
+				"type": "string",
+				"value": "page"
+			}
+		],
+		"orderBy": {
+			"value": "visitors",
+			"order": "desc"
+		},
+		"limit": 15
+	},
+	"locales": {
+		"title": "Site language",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": false
+			},
+			{
+				"key": "status",
+				"operation": "eq",
+				"type": "number",
+				"value": 200
+			}
+		],
+		"calculations": [
+			{
+				"operator": "uniq",
+				"key": "visitor",
+				"keyType": "string",
+				"alias": "visitors"
+			},
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		],
+		"groupBys": [
+			{
+				"type": "string",
+				"value": "locale"
+			}
+		],
+		"orderBy": {
+			"value": "visitors",
+			"order": "desc"
+		},
+		"limit": 15
+	},
+	"countries": {
+		"title": "Countries",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": false
+			},
+			{
+				"key": "status",
+				"operation": "eq",
+				"type": "number",
+				"value": 200
+			}
+		],
+		"calculations": [
+			{
+				"operator": "uniq",
+				"key": "visitor",
+				"keyType": "string",
+				"alias": "visitors"
+			},
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		],
+		"groupBys": [
+			{
+				"type": "string",
+				"value": "country"
+			}
+		],
+		"orderBy": {
+			"value": "visitors",
+			"order": "desc"
+		},
+		"limit": 15
+	},
+	"referrers": {
+		"title": "Referrers",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": false
+			},
+			{
+				"key": "status",
+				"operation": "eq",
+				"type": "number",
+				"value": 200
+			},
+			{
+				"key": "referrer",
+				"operation": "neq",
+				"type": "string",
+				"value": "internal"
+			}
+		],
+		"calculations": [
+			{
+				"operator": "uniq",
+				"key": "visitor",
+				"keyType": "string",
+				"alias": "visitors"
+			},
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		],
+		"groupBys": [
+			{
+				"type": "string",
+				"value": "referrer"
+			}
+		],
+		"orderBy": {
+			"value": "visitors",
+			"order": "desc"
+		},
+		"limit": 15
+	},
+	"campaigns": {
+		"title": "UTM campaigns",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": false
+			},
+			{
+				"key": "status",
+				"operation": "eq",
+				"type": "number",
+				"value": 200
+			},
+			{
+				"key": "utm_source",
+				"operation": "neq",
+				"type": "string",
+				"value": ""
+			}
+		],
+		"calculations": [
+			{
+				"operator": "uniq",
+				"key": "visitor",
+				"keyType": "string",
+				"alias": "visitors"
+			},
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		],
+		"groupBys": [
+			{
+				"type": "string",
+				"value": "utm_source"
+			}
+		],
+		"orderBy": {
+			"value": "visitors",
+			"order": "desc"
+		},
+		"limit": 15
+	},
+	"devices": {
+		"title": "Devices",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": false
+			},
+			{
+				"key": "status",
+				"operation": "eq",
+				"type": "number",
+				"value": 200
+			}
+		],
+		"calculations": [
+			{
+				"operator": "uniq",
+				"key": "visitor",
+				"keyType": "string",
+				"alias": "visitors"
+			},
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		],
+		"groupBys": [
+			{
+				"type": "string",
+				"value": "device"
+			}
+		],
+		"orderBy": {
+			"value": "visitors",
+			"order": "desc"
+		},
+		"limit": 15
+	},
+	"browsers": {
+		"title": "Browsers",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": false
+			},
+			{
+				"key": "status",
+				"operation": "eq",
+				"type": "number",
+				"value": 200
+			}
+		],
+		"calculations": [
+			{
+				"operator": "uniq",
+				"key": "visitor",
+				"keyType": "string",
+				"alias": "visitors"
+			},
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		],
+		"groupBys": [
+			{
+				"type": "string",
+				"value": "browser"
+			}
+		],
+		"orderBy": {
+			"value": "visitors",
+			"order": "desc"
+		},
+		"limit": 15
+	},
+	"os": {
+		"title": "Operating systems",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": false
+			},
+			{
+				"key": "status",
+				"operation": "eq",
+				"type": "number",
+				"value": 200
+			}
+		],
+		"calculations": [
+			{
+				"operator": "uniq",
+				"key": "visitor",
+				"keyType": "string",
+				"alias": "visitors"
+			},
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		],
+		"groupBys": [
+			{
+				"type": "string",
+				"value": "os"
+			}
+		],
+		"orderBy": {
+			"value": "visitors",
+			"order": "desc"
+		},
+		"limit": 15
+	},
+	"languages": {
+		"title": "Browser languages",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": false
+			},
+			{
+				"key": "status",
+				"operation": "eq",
+				"type": "number",
+				"value": 200
+			}
+		],
+		"calculations": [
+			{
+				"operator": "uniq",
+				"key": "visitor",
+				"keyType": "string",
+				"alias": "visitors"
+			},
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		],
+		"groupBys": [
+			{
+				"type": "string",
+				"value": "language"
+			}
+		],
+		"orderBy": {
+			"value": "visitors",
+			"order": "desc"
+		},
+		"limit": 15
+	},
+	"not_found": {
+		"title": "404 pages",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": false
+			},
+			{
+				"key": "status",
+				"operation": "eq",
+				"type": "number",
+				"value": 404
+			}
+		],
+		"calculations": [
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		],
+		"groupBys": [
+			{
+				"type": "string",
+				"value": "path"
+			}
+		],
+		"orderBy": {
+			"value": "pageviews",
+			"order": "desc"
+		},
+		"limit": 20
+	},
+	"bots": {
+		"title": "Bot page views",
+		"filters": [
+			{
+				"key": "event",
+				"operation": "eq",
+				"type": "string",
+				"value": "pageview"
+			},
+			{
+				"key": "bot",
+				"operation": "eq",
+				"type": "boolean",
+				"value": true
+			}
+		],
+		"calculations": [
+			{
+				"operator": "count",
+				"alias": "pageviews"
+			}
+		],
+		"groupBys": [
+			{
+				"type": "string",
+				"value": "page"
+			}
+		],
+		"orderBy": {
+			"value": "pageviews",
+			"order": "desc"
+		},
+		"limit": 15
+	}
+}
