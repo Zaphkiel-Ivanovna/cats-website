@@ -68,8 +68,7 @@
 				"alias": "pageviews"
 			}
 		],
-		"granularity": 86400,
-		"timeseries": true
+		"perDay": true
 	},
 	"pages": {
 		"title": "Top pages",

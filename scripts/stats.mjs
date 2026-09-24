@@ -27,13 +27,11 @@ if (!token || !account) {
 const to = Date.now();
 const from = to - days * 24 * 60 * 60 * 1000;
 
-async function run(id, query) {
+async function run(id, query, timeframe = { from, to }) {
 	const body = {
 		queryId: `cats-${id}`,
-		timeframe: { from, to },
+		timeframe,
 		view: 'calculations',
-		chart: Boolean(query.timeseries),
-		granularity: query.granularity,
 		limit: query.limit ?? 100,
 		parameters: {
 			datasets: ['cloudflare-workers'],
@@ -48,7 +46,7 @@ async function run(id, query) {
 				},
 				...query.filters.map((filter) => ({ kind: 'filter', ...filter })),
 			],
-			calculations: query.calculations.map((calc) => ({ key: null, keyType: null, ...calc })),
+			calculations: query.calculations,
 			groupBys: query.groupBys ?? [],
 			orderBy: query.orderBy,
 			limit: query.limit ?? 100,
@@ -84,10 +82,36 @@ function rows(result) {
 	return table;
 }
 
+function dayWindows() {
+	const windows = [];
+	const day = 24 * 60 * 60 * 1000;
+	for (let start = Math.floor(from / day) * day; start < to; start += day) {
+		windows.push({
+			label: new Date(start).toISOString().slice(0, 10),
+			timeframe: { from: Math.max(start, from), to: Math.min(start + day, to) },
+		});
+	}
+	return windows;
+}
+
+async function perDay(id, query) {
+	const table = [];
+	for (const { label, timeframe } of dayWindows()) {
+		const [total = { label }] = rows(await run(id, query, timeframe));
+		table.push({ ...total, label });
+	}
+	return table;
+}
+
 console.log(`\n${service}, last ${days} day(s)\n`);
 for (const [id, query] of Object.entries(queries)) {
 	if (only && !only.includes(id)) continue;
 	try {
+		if (query.perDay && !raw) {
+			console.log(`## ${query.title}`);
+			console.table(await perDay(id, query));
+			continue;
+		}
 		const result = await run(id, query);
 		console.log(`## ${query.title}`);
 		if (raw) {
