@@ -27,39 +27,14 @@ if (!token || !account) {
 const to = Date.now();
 const from = to - days * 24 * 60 * 60 * 1000;
 
-async function run(id, query, timeframe = { from, to }) {
-	const body = {
-		queryId: `cats-${id}`,
-		timeframe,
-		view: 'calculations',
-		limit: query.limit ?? 100,
-		parameters: {
-			datasets: ['cloudflare-workers'],
-			filterCombination: 'and',
-			filters: [
-				{
-					kind: 'filter',
-					key: '$metadata.service',
-					operation: 'eq',
-					type: 'string',
-					value: service,
-				},
-				...query.filters.map((filter) => ({ kind: 'filter', ...filter })),
-			],
-			calculations: query.calculations,
-			groupBys: query.groupBys ?? [],
-			orderBy: query.orderBy,
-			limit: query.limit ?? 100,
-		},
-	};
-	const response = await fetch(
-		`https://api.cloudflare.com/client/v4/accounts/${account}/workers/observability/telemetry/query`,
-		{
-			method: 'POST',
-			headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-			body: JSON.stringify(body),
-		},
-	);
+const api = `https://api.cloudflare.com/client/v4/accounts/${account}/workers/observability`;
+
+async function call(path, method = 'GET', body) {
+	const response = await fetch(`${api}${path}`, {
+		method,
+		headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+		body: body && JSON.stringify(body),
+	});
 	const json = await response.json();
 	if (!response.ok || json.success === false) {
 		throw new Error(
@@ -67,6 +42,43 @@ async function run(id, query, timeframe = { from, to }) {
 		);
 	}
 	return json.result;
+}
+
+function parameters(query) {
+	return {
+		datasets: ['cloudflare-workers'],
+		filterCombination: 'and',
+		filters: [
+			{ key: '$metadata.service', operation: 'eq', type: 'string', value: service },
+			...query.filters,
+		],
+		calculations: query.calculations,
+		groupBys: query.groupBys ?? [],
+		orderBy: query.orderBy,
+		limit: query.limit ?? 100,
+	};
+}
+
+function run(id, query, timeframe = { from, to }) {
+	return call('/telemetry/query', 'POST', {
+		queryId: `cats-${id}`,
+		timeframe,
+		view: 'calculations',
+		limit: query.limit ?? 100,
+		parameters: parameters(query),
+	});
+}
+
+async function save() {
+	const existing = await call('/queries');
+	for (const query of Object.values(queries)) {
+		const name = `Cats: ${query.title}`;
+		const body = { name, description: query.description ?? '', parameters: parameters(query) };
+		const match = existing.find((entry) => entry.name === name);
+		if (match) await call(`/queries/${match.id}`, 'DELETE');
+		await call('/queries', 'POST', body);
+		console.log(`${match ? 'updated' : 'created'}  ${name}`);
+	}
 }
 
 function rows(result) {
@@ -101,6 +113,11 @@ async function perDay(id, query) {
 		table.push({ ...total, label });
 	}
 	return table;
+}
+
+if (process.argv.includes('--save')) {
+	await save();
+	process.exit(0);
 }
 
 console.log(`\n${service}, last ${days} day(s)\n`);
