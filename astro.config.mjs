@@ -8,7 +8,7 @@ import { siteUrl } from './src/site.ts';
 const site = siteUrl(
 	process.env.SITE_URL,
 	process.env.VERCEL_PROJECT_PRODUCTION_URL,
-	'https://cats.zaphkiel.dev',
+	'https://cats-plugin.zaphkiel.dev',
 );
 
 export default defineConfig({
