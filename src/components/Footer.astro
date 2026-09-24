@@ -2,8 +2,21 @@
 import Default from '@astrojs/starlight/components/Footer.astro';
 import Analytics from '@vercel/analytics/astro';
 import SpeedInsights from '@vercel/speed-insights/astro';
+
+const onVercel = Boolean(process.env.VERCEL);
+const cloudflareToken = import.meta.env.PUBLIC_CF_WEB_ANALYTICS_TOKEN;
 ---
 
 <Default />
-<Analytics />
-<SpeedInsights />
+{onVercel && (
+	<>
+		<Analytics />
+		<SpeedInsights />
+	</>
+)}
+{cloudflareToken && <script
+	is:inline
+	defer
+	src="https://static.cloudflareinsights.com/beacon.min.js"
+	data-cf-beacon={JSON.stringify({ token: cloudflareToken })}
+></script>}

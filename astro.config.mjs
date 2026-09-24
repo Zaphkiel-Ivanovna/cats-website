@@ -5,7 +5,11 @@ import icon from 'astro-icon';
 import { sidebarPage } from './src/icons.ts';
 import { siteUrl } from './src/site.ts';
 
-const site = siteUrl(process.env.SITE_URL, process.env.VERCEL_PROJECT_PRODUCTION_URL);
+const site = siteUrl(
+	process.env.SITE_URL,
+	process.env.VERCEL_PROJECT_PRODUCTION_URL,
+	'https://cats.zaphkiel.dev',
+);
 
 export default defineConfig({
 	site,
